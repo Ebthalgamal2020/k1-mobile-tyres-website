@@ -7,6 +7,7 @@
 [![Live demo](https://img.shields.io/badge/Live%20demo-Homepage-E31B22?style=for-the-badge)](https://ebthalgamal2020.github.io/k1-mobile-tyres-website/)
 [![V3](https://img.shields.io/badge/Version-V3-03254F?style=for-the-badge)](https://ebthalgamal2020.github.io/k1-mobile-tyres-website/V3/)
 [![V4](https://img.shields.io/badge/Version-V4-03254F?style=for-the-badge)](https://ebthalgamal2020.github.io/k1-mobile-tyres-website/V4/)
+[![V5 Road Max](https://img.shields.io/badge/V5-Road%20Max-D81800?style=for-the-badge)](https://ebthalgamal2020.github.io/k1-mobile-tyres-website/V5/)
 
 </div>
 
@@ -38,6 +39,7 @@ All versions keep the business's real details — phone, WhatsApp, services, cov
 | 🏁 **Main homepage** | https://ebthalgamal2020.github.io/k1-mobile-tyres-website/ |
 | 🔹 **V3** | https://ebthalgamal2020.github.io/k1-mobile-tyres-website/V3/ |
 | 🔹 **V4** | https://ebthalgamal2020.github.io/k1-mobile-tyres-website/V4/ |
+| 🔴 **V5 — Road Max** | https://ebthalgamal2020.github.io/k1-mobile-tyres-website/V5/ |
 
 ## Website versions
 
@@ -62,6 +64,14 @@ Each version is fully self-contained in its own folder, with its own `index.html
 - Light grey content sections with a bento-style service grid using K1's own job photos.
 - Manrope typography; single-file build with inline CSS and JavaScript.
 
+### V5 — Road Max: "The Call-Out" (experimental, art-directed)
+- New **Road Max** brand: red `#D81800`, navy `#183860`, deep navy `#0F2540`, Barlow Condensed + Inter, official Road Max logo.
+- The page is one journey in six chapters: **Stopped → What happened? → The call → On the way → On site → Back on the road**.
+- A red road runs through the whole experience: hero slash, chapter progress thread, the navy road behind the phone number, and the route on the Kent map.
+- Editorial services grid with a dominant Emergency feature and hover/tap stories; full-red "The call" campaign moment; road-atlas Kent map where a postcode draws the route from Dover (Dover & Kent only); a wheel that turns a quarter-turn per step; genuine Google reviews as roadside sign posts.
+- Logo ident: the wheel turns once and settles into the official logo. Fully responsive, with a static, readable version for `prefers-reduced-motion`.
+- Plain HTML, CSS and JavaScript — no build step.
+
 ## Technologies used
 
 | | |
@@ -70,7 +80,7 @@ Each version is fully self-contained in its own folder, with its own `index.html
 | **Styling** | Tailwind CSS (main homepage), hand-written CSS with custom properties (V3, V4) |
 | **Scripting** | Vanilla JavaScript — no frameworks |
 | **Motion** | CSS animations, IntersectionObserver reveals, SVG/SMIL map animation, [Lenis](https://github.com/darkroomengineering/lenis) smooth scroll |
-| **Fonts** | Google Fonts — Barlow / Barlow Condensed (main), Manrope (V3, V4) |
+| **Fonts** | Google Fonts — Barlow / Barlow Condensed (main), Manrope (V3, V4), Barlow Condensed + Inter (V5) |
 | **Images** | Optimised WebP |
 | **Hosting** | GitHub Pages |
 
@@ -92,6 +102,12 @@ k1-mobile-tyres-website/
 ├── V4/
 │   ├── index.html          # V4 (CSS + JS inline)
 │   └── assets/images/      # V4 images only
+├── V5/                     # Road Max — "The Call-Out"
+│   ├── index.html
+│   └── assets/
+│       ├── css/v5.css
+│       ├── js/v5.js
+│       └── img/            # V5 images + official Road Max logo files
 ├── .nojekyll               # Serve files as-is on GitHub Pages
 └── README.md
 ```
@@ -106,7 +122,7 @@ cd k1-mobile-tyres-website
 python -m http.server 8000
 ```
 
-Then open http://localhost:8000/, http://localhost:8000/V3/ or http://localhost:8000/V4/.
+Then open http://localhost:8000/, http://localhost:8000/V3/, http://localhost:8000/V4/ or http://localhost:8000/V5/.
 
 ## Image credits
 
