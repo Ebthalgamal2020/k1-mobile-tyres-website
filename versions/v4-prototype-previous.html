@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Road Max · V4 Sidewall prototype (previous)</title>
+<meta name="description" content="Road Max: 24/7 mobile tyre fitting, repairs and roadside help across Dover &amp; Kent.">
+<link rel="icon" href="files/assets/images/roadmax/roadmax-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#D81800; --navy:#183860; --deep:#0F2540; --deeper:#0A1B30; --ink:#071426; --grey:#F5F5F5;
+  --w72:rgba(255,255,255,.72); --w60:rgba(255,255,255,.62); --rule:rgba(255,255,255,.16);
+  --pad:clamp(24px,8vw,128px);
+  --bc:'Barlow Condensed','Arial Narrow',sans-serif; --in:'Inter',system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--deep);color:#fff;font:400 16px/1.55 var(--in);overflow-x:clip}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.eyebrow{display:flex;align-items:center;gap:12px;margin:0;font:600 13px/1.4 var(--in);letter-spacing:.14em;text-transform:uppercase;color:var(--w72)}
+.eyebrow::before{content:"";width:28px;height:2px;background:var(--red);flex:none}
+
+/* ---------- top: logo top-left (scrolls away), call link pinned top-right ---------- */
+.top{position:absolute;top:0;left:0;right:0;z-index:50;height:88px;display:flex;align-items:center;padding:0 var(--pad)}
+.brand{display:flex;align-items:center;min-height:48px}
+.logo{height:30px;width:auto}
+.callfix{position:fixed;top:20px;right:24px;z-index:60;display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;background:var(--red);color:#fff;text-decoration:none;border-radius:2px;font:700 21px/1 var(--bc);letter-spacing:.02em;box-shadow:0 8px 24px rgba(4,11,22,.35)}
+.callfix svg{width:18px;height:18px}
+@media (hover:hover){.callfix:hover{background:#B81400}}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:12px;min-height:64px;padding:0 22px;text-decoration:none;border-radius:2px;transition:background-color .2s,border-color .2s;text-align:left}
+.btn svg{width:22px;height:22px;flex:none}
+.btn span{display:flex;flex-direction:column;line-height:1}
+.btn small{font:500 12px/1.2 var(--in);letter-spacing:.04em;opacity:.88;margin-bottom:4px}
+.btn b{font:700 26px/1 var(--bc);letter-spacing:.02em;white-space:nowrap}
+.btn.call{background:var(--red);color:#fff}
+.btn.wa{border:1.5px solid rgba(255,255,255,.45);color:#fff}
+.wa-ico{color:#25D366}
+@media (hover:hover){.btn.call:hover{background:#B81400}.btn.wa:hover{border-color:#fff}}
+
+/* ---------- hero: the horizon tyre ---------- */
+.hero{position:relative;min-height:max(100vh,680px);min-height:max(100svh,680px);display:flex;flex-direction:column;overflow:clip;background:var(--deep)}
+.hero-copy{position:relative;z-index:4;padding:96px var(--pad) 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.hero-copy .eyebrow::after{content:"";width:28px;height:2px;background:var(--red);flex:none}
+.slot{display:grid;margin:18px 0 22px;width:100%;justify-items:center}
+.ans{grid-area:1/1;align-self:center;max-width:1000px}
+.ans:not(.is-on){visibility:hidden}
+.ans.is-in{animation:ansIn .46s var(--ease) both}
+.ans.is-out{visibility:visible;animation:ansOut .22s ease-in both}
+@keyframes ansIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes ansOut{to{opacity:0;transform:translateY(-20px)}}
+.h1{margin:0;font:800 clamp(72px,7.8vw,124px)/.88 var(--bc);text-transform:uppercase}
+.lede{margin:14px auto 0;max-width:52ch;font-size:18px;color:var(--w72)}
+.a-k{margin:0 0 10px;font:600 13px/1.2 var(--in);letter-spacing:.14em;text-transform:uppercase}
+.a-k i{font-style:normal;color:var(--red);margin-right:8px}
+.a-t{margin:0 auto;max-width:22ch;font:800 clamp(48px,4.6vw,72px)/.92 var(--bc);text-transform:uppercase}
+.a-b{margin:12px auto 0;max-width:56ch;font-size:18px;color:var(--w72)}
+.cta{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.horizon{position:relative;flex:1 1 auto;min-height:300px}
+.arcbox{position:absolute;inset:0}
+.tyre-ghost,.tyre{--D:160vw;position:absolute;width:var(--D);height:var(--D);left:calc(50% - var(--D) / 2);top:72px}
+.tyre-ghost{visibility:hidden;pointer-events:none}
+.tyre-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.tyre{border-radius:50%;box-shadow:0 -30px 120px rgba(3,10,22,.5)}
+.spin{position:absolute;inset:0;will-change:transform}
+.spin svg,.tyre .light{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tyre .seg{fill:rgba(255,255,255,.6);transition:fill .35s}
+.tyre .seg.tech{fill:rgba(255,255,255,.92)}
+.tyre .seg.on,.tyre .idx.on{fill:var(--red)}
+.tyre .idx{fill:rgba(255,255,255,.75);opacity:0;transition:fill .35s,opacity .35s}
+.tyre.svc .idx{opacity:1}
+.light .svc-mark{opacity:var(--q,0)}
+.choreo .tyre-layer{position:fixed;inset:0;z-index:3}
+.choreo .tyre{left:0;top:0;transform-origin:0 0;will-change:transform}
+.triage{position:absolute;inset:0;z-index:4;margin:0;padding:0;list-style:none}
+.triage li{position:absolute;left:0;top:0;white-space:nowrap}
+.t{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:56px;padding:0 4px;font:700 clamp(28px,2.7vw,40px)/1 var(--bc);text-transform:uppercase;color:var(--w72);letter-spacing:.01em;transition:color .2s}
+.t sup{font:600 11px/1 var(--in);letter-spacing:.06em;color:var(--w60);transform:translateY(-12px)}
+.t::before{content:"";position:absolute;left:4px;right:4px;bottom:6px;height:3px;background:var(--red);transform:scaleX(0);transition:transform .35s var(--ease)}
+.t[aria-pressed="true"]{color:#fff}
+.t[aria-pressed="true"]::before{transform:scaleX(1)}
+.t[aria-pressed="true"] sup{color:#fff}
+@media (hover:hover){.t:hover{color:#fff}}
+
+/* ---------- sidewall dial (desktop navigation) ---------- */
+.dial-nav{position:fixed;left:16px;bottom:16px;z-index:55;display:flex;align-items:center;gap:6px}
+.dn{position:relative;width:124px;height:124px;border-radius:50%;background:rgba(10,27,48,.94)}
+.dn-ring{position:absolute;inset:0;will-change:transform}
+.dn-ring svg{position:absolute;inset:18px;width:88px;height:88px}
+.dn-t{position:absolute;left:44px;top:44px;width:36px;height:36px;transform:rotate(var(--a)) translateY(-44px)}
+.dn-t i{position:absolute;left:16px;top:4px;width:4px;height:14px;background:rgba(255,255,255,.75);transition:background-color .3s,height .3s}
+.dn-t[aria-current="true"] i{background:var(--red);height:20px;top:2px}
+@media (hover:hover){.dn-t:hover i{background:#fff}}
+.dn-ptr{position:absolute;left:56px;top:0;width:0;height:0;border:6px solid transparent;border-top:9px solid var(--red)}
+.dn-hub{position:absolute;left:42px;top:42px;width:40px;height:40px;display:grid;place-items:center;font:700 18px/1 var(--bc);pointer-events:none}
+.dn-lab{margin:0;padding:8px 12px;background:rgba(10,27,48,.92);font:600 12px/1 var(--in);letter-spacing:.12em;text-transform:uppercase;color:#fff;border-radius:2px}
+
+/* ---------- services ---------- */
+.svc{position:relative;background:var(--deep);border-top:1px solid var(--rule)}
+.svc-grid{display:grid;grid-template-columns:42% 1fr}
+.stage-sticky{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--ink)}
+.stage-sticky img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s}
+.stage-sticky img.on{opacity:1}
+.stage-sticky::after{content:"";position:absolute;inset:0;background:rgba(10,27,48,.74)}
+.stage-cap{position:absolute;z-index:2;right:32px;bottom:32px;justify-content:flex-end;margin:0;display:flex;align-items:baseline;gap:14px;font:700 24px/1 var(--bc);text-transform:uppercase;letter-spacing:.02em}
+.stage-cap .n{color:#fff;background:var(--red);padding:4px 6px}
+.stage-cap .of{font:500 13px/1 var(--in);color:var(--w72);letter-spacing:.08em}
+.svc-list{padding:34vh var(--pad) 18vh 64px}
+.sec-head{max-width:640px;margin-bottom:6vh}
+.h2{margin:16px 0 0;font:800 clamp(52px,6vw,96px)/.9 var(--bc);text-transform:uppercase}
+.sec-p{margin:20px 0 0;font-size:18px;color:var(--w72);max-width:46ch}
+.rail-top{display:none}
+.rows{list-style:none;margin:0;padding:0}
+.row{min-height:50vh;display:grid;grid-template-columns:72px 1fr;align-content:center;column-gap:8px;border-top:1px solid var(--rule);padding:40px 0}
+.row:last-child{border-bottom:1px solid var(--rule)}
+.mark{grid-row:1/5;display:flex;flex-direction:column;gap:10px;padding-top:8px}
+.mark svg{width:34px;height:52px}
+.mark svg{fill:rgba(255,255,255,.3);transition:fill .35s}
+.mark b{font:600 13px/1 var(--in);letter-spacing:.08em;color:var(--w60);transition:color .35s}
+.row h3{margin:0;font:800 clamp(44px,4.4vw,72px)/.92 var(--bc);text-transform:uppercase;color:var(--w60);transition:color .35s}
+.row p{margin:16px 0 0;max-width:44ch;font-size:18px;color:var(--w72)}
+.row .tag{margin-top:14px;font:600 12px/1.4 var(--in);letter-spacing:.12em;text-transform:uppercase;color:var(--w60)}
+.row-img{display:none}
+.row.on h3{color:#fff}
+.row.on .mark svg{fill:var(--red)}
+.row.on .mark b{color:#fff}
+
+/* ---------- sidewall decoder (light spec sheet) ---------- */
+.spec{background:var(--grey);color:var(--deep);padding:120px var(--pad)}
+.spec .eyebrow{color:var(--deep)}
+.spec-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;border-top:2px solid var(--deep);border-bottom:1px solid rgba(15,37,64,.25);padding:12px 0;margin-bottom:56px;font:600 12px/1.4 var(--in);letter-spacing:.12em;text-transform:uppercase}
+.spec-head{display:grid;grid-template-columns:1fr 1fr;gap:24px 64px;align-items:end;margin-bottom:48px}
+.spec .sec-p{color:#33475f;margin:0}
+.spec-arc{display:block;width:100%;height:60px}
+.code{display:flex;flex-wrap:wrap;align-items:flex-start;font:800 clamp(64px,11vw,184px)/.86 var(--bc);letter-spacing:-.01em}
+.part{position:relative;display:flex;flex-direction:column;align-items:flex-start;padding:0 .06em 0 0;color:var(--deep);font:inherit;letter-spacing:inherit;transition:color .25s}
+.part .g{position:relative;display:block}
+.part .g::after{content:"";position:absolute;left:0;right:0;bottom:-.04em;height:.045em;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.part .lbl{display:flex;align-items:center;gap:8px;margin-top:18px;font:600 12px/1 var(--in);letter-spacing:.12em;text-transform:uppercase;color:#33475f;white-space:nowrap}
+.part .lbl::before{content:"";width:1px;height:26px;background:currentColor;opacity:.5}
+.part .lbl i{font-style:normal;color:var(--deep)}
+.part[aria-pressed="true"]{color:var(--red)}
+.part[aria-pressed="true"] .g::after{transform:scaleX(1)}
+.part[aria-pressed="true"] .lbl,.part[aria-pressed="true"] .lbl i{color:var(--red)}
+.code .sp{width:.22em}
+.code .sl{color:rgba(15,37,64,.35);padding-right:.04em}
+@media (hover:hover){.part:hover{color:var(--red)}}
+.explain{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:20px 64px;margin-top:44px;padding-top:28px;border-top:2px solid var(--deep);min-height:190px;align-content:start}
+.ex-k{margin:0 0 8px;font:600 12px/1.2 var(--in);letter-spacing:.12em;text-transform:uppercase;color:#33475f}
+.ex-v{margin:0;font:800 clamp(48px,5vw,80px)/.9 var(--bc);text-transform:uppercase}
+.ex-t{margin:0;font-size:19px;line-height:1.55;max-width:52ch;color:#1d324d}
+.ex-swap{animation:ansIn .4s var(--ease) both}
+.photo-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 40px;margin-top:56px;padding:28px 0;border-top:1px solid rgba(15,37,64,.25);border-bottom:1px solid rgba(15,37,64,.25)}
+.photo-cta p{margin:0;font:800 clamp(30px,3.4vw,52px)/.95 var(--bc);text-transform:uppercase;max-width:22ch}
+.photo-cta .btn.wa{background:var(--deep);border-color:var(--deep)}
+.brands{margin:28px 0 0;font-size:15px;color:#33475f;max-width:80ch}
+
+/* ---------- coverage ---------- */
+.cov{background:var(--deep);padding:120px var(--pad);display:grid;grid-template-columns:5fr 7fr;gap:48px 64px;align-items:center;border-top:1px solid var(--rule)}
+.towns{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+.towns li{border-top:1px solid var(--rule);padding:10px 0;font:600 20px/1.2 var(--bc);text-transform:uppercase;letter-spacing:.03em;color:var(--w72)}
+.towns li:first-child{color:#fff}
+.towns li:first-child::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:10px;vertical-align:2px}
+.map{width:100%;height:auto;display:block}
+.map .ring{transform-box:view-box;transform-origin:936.2px 436.4px}
+.js .map .ring{transform:scale(.12);opacity:0;transition:transform 1.5s var(--ease),opacity .6s}
+.js .map.in .ring{transform:none;opacity:1}
+.map .lab{font:500 21px var(--in);fill:rgba(255,255,255,.8)}
+.map .dover{font:800 40px var(--bc);fill:#fff;letter-spacing:.04em}
+
+/* ---------- reviews ---------- */
+.rev{background:var(--deeper);padding:120px 0;border-top:1px solid var(--rule)}
+.rev-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px;padding:0 var(--pad);margin-bottom:56px}
+.rev-nav{display:flex;gap:8px}
+.rev-nav button{width:56px;height:56px;border:1.5px solid rgba(255,255,255,.4);border-radius:2px;display:grid;place-items:center}
+.rev-nav svg{width:22px;height:22px}
+@media (hover:hover){.rev-nav button:hover{border-color:#fff}}
+.rail{display:flex;gap:clamp(24px,4vw,64px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--pad);padding:0 var(--pad) 8px;scrollbar-width:none;cursor:grab;overscroll-behavior-x:contain}
+.rail::-webkit-scrollbar{display:none}
+.rail.drag{scroll-snap-type:none;cursor:grabbing;user-select:none}
+.q{flex:0 0 min(860px,70vw);scroll-snap-align:start;margin:0;border-top:2px solid rgba(255,255,255,.85);padding-top:28px}
+.q blockquote{margin:0;font:600 clamp(28px,2.7vw,42px)/1.14 var(--bc);letter-spacing:.005em}
+.q blockquote::before{content:"\201C";display:block;font:800 72px/.6 var(--bc);color:var(--red);margin-bottom:14px}
+.q figcaption{margin-top:24px;font-size:14px;color:var(--w72)}
+.q figcaption b{color:#fff;font-weight:600}
+.q:last-child{margin-right:var(--pad)}
+
+/* ---------- contact ---------- */
+.contact{background:var(--deep);padding:120px var(--pad) 160px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px 64px;align-items:center;border-top:1px solid var(--rule)}
+.big-num{display:inline-block;margin:28px 0 8px;font:800 clamp(64px,8.4vw,136px)/.9 var(--bc);text-decoration:none;white-space:nowrap}
+.c-sub{margin:0;font-size:16px;color:var(--w72)}
+.c-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.c-mail{display:inline-block;margin-top:18px;color:var(--w72);font-size:16px;min-height:48px;line-height:48px}
+.cdial{width:100%;max-width:280px;margin:40px 40px 0 auto;aspect-ratio:1}
+.contact{align-items:start}
+.ticket{background:var(--grey);color:var(--deep);padding:28px 32px 32px;border-top:4px solid var(--red)}
+.tk-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px;border-bottom:1px solid rgba(15,37,64,.25);padding-bottom:10px;font:600 12px/1.4 var(--in);letter-spacing:.12em;text-transform:uppercase}
+.tk-t{margin:22px 0 0;font:800 clamp(40px,3.6vw,56px)/.92 var(--bc);text-transform:uppercase}
+.tk-p{margin:8px 0 18px;color:#33475f;font-size:15px}
+.fld{border-top:1px solid rgba(15,37,64,.25);padding:14px 0 12px}
+.fld label{display:flex;align-items:center;gap:10px;margin-bottom:8px;font:600 12px/1.3 var(--in);letter-spacing:.12em;text-transform:uppercase}
+.fld label i{font-style:normal;display:inline-grid;place-items:center;min-width:30px;height:22px;padding:0 4px;border:1px solid var(--deep);font-size:11px;letter-spacing:.06em;transition:background-color .12s,color .12s,border-color .12s}
+.fld label em{font-style:normal;font-weight:500;letter-spacing:.06em;text-transform:none;color:#4a5d74}
+.fld.lit label i{background:var(--red);border-color:var(--red);color:#fff}
+.fld input,.fld select{display:block;width:100%;min-height:52px;padding:0 14px;font:500 17px/1.2 var(--in);color:var(--deep);background-color:#fff;border:1.5px solid rgba(15,37,64,.45);border-radius:2px;-webkit-appearance:none;appearance:none}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%230F2540' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:44px}
+.fld input:focus-visible,.fld select:focus-visible{outline:3px solid var(--deep);outline-offset:2px;border-color:var(--deep)}
+.fld [aria-invalid="true"]{border-color:var(--red);border-width:2px}
+.err{margin:8px 0 0;color:#B81400;font:600 14px/1.4 var(--in)}
+.err::before{content:"Error: "}
+.hint{margin:6px 0 0;color:#4a5d74;font-size:13px}
+.tk-send{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;border-top:2px solid var(--deep);padding-top:20px;margin-top:6px}
+.tk-note{margin:0;font-size:14px;color:#33475f;max-width:28ch}
+.tk-alt{margin:16px 0 0;font-size:15px}
+.tk-alt a{font-weight:600;color:var(--deep);display:inline-block;min-height:48px;line-height:48px}
+.size-use{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:24px}
+.size-use .btn{border:1.5px solid var(--deep);color:var(--deep);min-height:52px}
+.size-use .btn b{font-size:22px}
+.size-note{margin:0;font-size:14px;color:#33475f}
+.size-note a{color:var(--deep);font-weight:600}
+.cdial svg{width:100%;height:100%;overflow:visible}
+.cdial .dt{font:800 44px var(--bc);fill:#fff;letter-spacing:4px}
+.cdial-spin{transform-box:view-box;transform-origin:250px 250px}
+
+.ft{background:var(--deeper);padding:48px var(--pad) 48px 300px;display:flex;flex-wrap:wrap;gap:20px 48px;align-items:center;justify-content:space-between;border-top:1px solid var(--rule);font-size:14px;color:var(--w72)}
+.ft p{margin:0}
+.thumb{display:none}
+
+/* ---------- phones ---------- */
+@media (max-width:859px){
+  :root{--pad:16px}
+  .top{position:sticky;height:56px;background:var(--deep);border-bottom:1px solid var(--rule);justify-content:space-between;padding-right:4px}
+  .logo{height:26px}
+  .callfix{position:static;width:48px;height:48px;min-height:48px;padding:0;justify-content:center;box-shadow:none}
+  .callfix .cl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .callfix svg{width:20px;height:20px}
+  .dial-nav{display:none}
+  .hero{min-height:calc(100svh - 56px);min-height:max(calc(100svh - 56px),560px)}
+  .hero-copy{padding:14px var(--pad) 0;align-items:stretch;text-align:left}
+  .hero-copy .eyebrow{font-size:12px}
+  .hero-copy .eyebrow::after{display:none}
+  .slot{margin:10px 0 14px;justify-items:start}
+  .ans{align-self:start}
+  .h1{font-size:52px;line-height:.92}
+  .lede{margin:12px 0 0;font-size:15px;max-width:34ch}
+  .eb-long{display:none}
+  .a-k{font-size:12px;margin-bottom:8px}
+  .a-t{margin:0;font-size:31px;line-height:.95;max-width:none}
+  .a-b{margin:8px 0 0;font-size:14px;line-height:1.42}
+  .cta{flex-wrap:nowrap;gap:8px;justify-content:stretch}
+  .btn{min-height:58px;padding:0 14px;gap:10px}
+  .btn svg{width:20px;height:20px}
+  .btn small{font-size:11px;margin-bottom:3px}
+  .btn b{font-size:22px}
+  .cta .call{flex:1.7 1 0}
+  .cta .wa{flex:1 1 0}
+  .horizon{display:flex;flex-direction:column;min-height:0}
+  .triage{position:static;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;padding:12px var(--pad) 0}
+  .triage li{position:static;transform:none!important}
+  .t{width:100%;min-height:56px;padding:0;font-size:23px;border-top:1px solid rgba(255,255,255,.2);justify-content:flex-start}
+  .t::before{left:0;right:0;bottom:8px}
+  .t sup{transform:none;font-size:10px}
+  .arcbox{position:relative;inset:auto;flex:1 1 auto;min-height:128px;overflow:hidden}
+  .tyre{--D:220vw;top:14px;clip-path:circle(50%);pointer-events:auto;touch-action:pan-y}
+  .tyre-ghost{display:none}
+
+  .svc-grid{display:block}
+  .svc-stage{display:none}
+  .svc-list{padding:72px 0 64px}
+  .sec-head{padding:0 var(--pad);margin-bottom:28px}
+  .h2{font-size:clamp(46px,13vw,60px)}
+  .sec-p{font-size:16px}
+  .rail-top{display:flex;align-items:center;justify-content:space-between;padding:0 var(--pad);margin-bottom:14px;font:600 12px/1 var(--in);letter-spacing:.12em;text-transform:uppercase;color:var(--w72)}
+  .rail-top .ind{display:flex;align-items:center;gap:12px}
+  .rail-top .ind b{font:700 20px/1 var(--bc);color:#fff;letter-spacing:.02em}
+  .mini{width:56px;height:56px}
+  .mini-spin{transform-box:view-box;transform-origin:50px 50px}
+  .rows{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--pad);padding:0 var(--pad) 4px;scrollbar-width:none;overscroll-behavior-x:contain}
+  .rows::-webkit-scrollbar{display:none}
+  .row{flex:0 0 84%;min-height:0;scroll-snap-align:start;display:block;padding:0 0 22px;border:0;border-top:2px solid rgba(255,255,255,.85);background:var(--deeper)}
+  .row:last-child{border-bottom:0;margin-right:var(--pad)}
+  .row-img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}
+  .mark{flex-direction:row;align-items:center;padding:18px 18px 0}
+  .mark svg{width:20px;height:30px}
+  .row h3{padding:12px 18px 0;font-size:36px;color:#fff}
+  .row p{padding:0 18px;margin-top:10px;font-size:15px}
+  .row .tag{padding:0 18px}
+
+  .spec{padding:72px var(--pad)}
+  .spec-meta{margin-bottom:32px}
+  .spec-head{grid-template-columns:1fr;margin-bottom:24px}
+  .spec-arc{height:36px}
+  .code{font-size:clamp(64px,21vw,96px);row-gap:6px}
+  .code .brk{flex-basis:100%;height:0}
+  .part{min-height:48px}
+  .part .lbl{margin-top:12px;font-size:11px}
+  .part .lbl::before{height:18px}
+  .explain{grid-template-columns:1fr;gap:12px;margin-top:28px;min-height:250px}
+  .ex-t{font-size:16px}
+  .photo-cta{margin-top:36px}
+  .photo-cta .btn{width:100%}
+
+  .cov{grid-template-columns:1fr;padding:72px var(--pad)}
+  .map .lab{display:none}
+  .towns li{font-size:18px}
+
+  .rev{padding:72px 0}
+  .rev-head{margin-bottom:32px}
+  .rev-nav{display:none}
+  .q{flex-basis:86%}
+  .q blockquote{font-size:26px}
+
+  .contact{grid-template-columns:1fr;padding:72px var(--pad)}
+  .big-num{font-size:clamp(52px,15.5vw,72px)}
+  .c-links .btn{flex:1 1 auto}
+  .cdial{max-width:240px;margin:32px auto 0}
+  .ticket{padding:22px 16px 24px;margin:0 calc(var(--pad) * -1) 24px}
+  .tk-btn{width:100%;justify-content:center}
+  .tk-note{max-width:none}
+  .size-use .btn{width:100%}
+
+  .ft{padding:40px var(--pad) 110px}
+  .thumb{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;gap:1px;background:var(--deeper);padding-bottom:env(safe-area-inset-bottom);transform:translateY(110%);transition:transform .35s var(--ease)}
+  .thumb.show{transform:none}
+  .thumb a{display:flex;align-items:center;justify-content:center;gap:10px;min-height:64px;text-decoration:none;color:#fff}
+  .thumb .tb-call{flex:1.7 1 0;background:var(--red)}
+  .thumb .tb-wa{flex:1 1 0;background:var(--navy)}
+  .thumb svg{width:20px;height:20px;flex:none}
+  .thumb span{display:flex;flex-direction:column;line-height:1}
+  .thumb small{font:500 11px/1.2 var(--in);opacity:.88;margin-bottom:3px}
+  .thumb b{font:700 22px/1 var(--bc);letter-spacing:.02em;white-space:nowrap}
+}
+@media (max-width:374px){
+  .btn{padding:0 12px;gap:8px}
+  .btn b{font-size:21px}
+  .t{font-size:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .map .ring{transform:none;opacity:1}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.5-.3z"/></symbol>
+  <symbol id="i-tread" viewBox="0 0 34 52"><path d="M4 0h12l-4 14H0zM22 0h12l-4 14H18zM6 19h12l-4 14H2zM24 19h10l-4 14H20zM4 38h12l-4 14H0zM22 38h12l-4 14H18z"/></symbol>
+</svg>
+
+<header class="top">
+  <a class="brand" href="#top" aria-label="Road Max, back to top"><img data-rm-logo="v4" class="logo" src="files/assets/images/roadmax/roadmax-logo-compact-white.svg" alt="Road Max"></a>
+  <a class="callfix" href="tel:01304350200"><svg aria-hidden="true"><use href="#i-phone"/></svg><span class="cl">Call 01304 350200</span></a>
+</header>
+
+<main>
+<!-- ================= HERO: the horizon tyre ================= -->
+<section class="hero" id="top" aria-labelledby="h1">
+  <div class="hero-copy">
+    <p class="eyebrow"><span>24/7<span class="eb-long"> mobile tyre fitting</span> · Dover &amp; Kent</span></p>
+    <div class="slot" aria-live="polite">
+      <div class="ans is-on" data-a="q">
+        <h1 class="h1" id="h1">What’s happened?</h1>
+        <p class="lede"><span class="eb-long">Choose what’s happened and we’ll show you what we’ll do. Or call now: </span>Road Max is open 24/7, 365 days a year, at home, at work or at the roadside.</p>
+      </div>
+      <div class="ans" data-a="0"><p class="a-k"><i>01</i>Flat tyre</p><p class="a-t">Flat tyre? We come to you.</p><p class="a-b">At home, at work or at the roadside. We check it where you are, then repair it or fit a new tyre: premium, mid-range or budget.</p></div>
+      <div class="ans" data-a="1"><p class="a-k"><i>02</i>Puncture</p><p class="a-t">Puncture? Repaired where you are.</p><p class="a-b">Mobile tyre repair, 24/7. If the tyre can’t be safely repaired, we fit a new one where you are.</p></div>
+      <div class="ans" data-a="2"><p class="a-k"><i>03</i>Blowout</p><p class="a-t">Blowout? Get safe. We’ll bring the tyre.</p><p class="a-b">Emergency tyre fitting, 365 days a year. We replace it where you are, or recover the vehicle if it can’t be fixed there.</p></div>
+      <div class="ans" data-a="3"><p class="a-k"><i>04</i>Locked wheel nut</p><p class="a-t">No locking key? We’ll get it off.</p><p class="a-b">Wheel nut removal, including locking wheel nuts, so the wheel can come off and the tyre can be repaired or replaced.</p></div>
+      <div class="ans" data-a="4"><p class="a-k"><i>05</i>Flat battery</p><p class="a-t">Flat battery? Jump start or a new one.</p><p class="a-b">Jump starts and battery replacement where you’ve stopped: at home, at work or at the roadside.</p></div>
+    </div>
+    <div class="cta" id="heroCta">
+      <a class="btn call" href="tel:01304350200"><svg aria-hidden="true"><use href="#i-phone"/></svg><span><small>Call 24/7</small><b>01304 350200</b></span></a>
+      <a class="btn wa" id="heroWa" href="https://wa.me/447842290576" target="_blank" rel="noopener"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg><span><small id="waNote">Message us</small><b>WhatsApp</b></span></a>
+    </div>
+  </div>
+  <div class="horizon" id="horizon">
+    <ul class="triage" id="triage" aria-label="What’s happened? Choose one">
+      <li><button class="t" type="button" data-i="0" aria-pressed="false"><sup>01</sup>Flat tyre</button></li>
+      <li><button class="t" type="button" data-i="1" aria-pressed="false"><sup>02</sup>Puncture</button></li>
+      <li><button class="t" type="button" data-i="2" aria-pressed="false"><sup>03</sup>Blowout</button></li>
+      <li><button class="t" type="button" data-i="3" aria-pressed="false"><sup>04</sup>Locked wheel nut</button></li>
+      <li><button class="t" type="button" data-i="4" aria-pressed="false"><sup>05</sup>Flat battery</button></li>
+    </ul>
+    <div class="arcbox">
+      <div class="tyre-ghost" aria-hidden="true"></div>
+      <div class="tyre-layer" aria-hidden="true">
+        <div class="tyre" id="tyre">
+          <div class="spin" id="spin"></div>
+          <svg class="light" viewBox="0 0 1000 1000" focusable="false">
+            <g fill="none" stroke="#fff" stroke-linecap="round">
+              <path id="lt1" stroke-opacity=".5" stroke-width="2.5"/><path id="lt2" stroke-opacity=".16" stroke-width="2"/><path id="lt3" stroke-opacity=".26" stroke-width="2"/>
+            </g>
+            <g class="svc-mark"><path d="M1030 500 L1006 487 L1006 513 Z" fill="#D81800"/></g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES ================= -->
+<section class="svc" id="services" aria-labelledby="svcH">
+  <div class="svc-grid">
+    <div class="svc-stage" aria-hidden="true">
+      <div class="stage-sticky" id="slot">
+        <img class="on" src="files/assets/images/rm/rm-v4-home.webp" alt="" width="1360" height="1020" loading="lazy">
+        <img src="files/assets/images/hero-tyre-change.webp" alt="" width="1500" height="1662" loading="lazy">
+        <img src="files/assets/images/hero-gloved-hands.webp" alt="" width="1800" height="1200" loading="lazy">
+        <img src="files/assets/images/rm/rm-v4-carpark.webp" alt="" width="765" height="1020" loading="lazy">
+        <img src="files/assets/images/rm/rm-v4-country.webp" alt="" width="765" height="1020" loading="lazy">
+        <img src="files/assets/images/rm/rm-v4-hero.webp" alt="" width="1600" height="900" loading="lazy">
+        <img src="files/assets/images/rm/rm-v4-jack.webp" alt="" width="765" height="1020" loading="lazy">
+        <img src="files/assets/images/premium-tread-v.webp" alt="" width="1400" height="2100" loading="lazy">
+        <p class="stage-cap"><span class="n" id="capN">01</span><span id="capT">Mobile tyre fitting</span><span class="of">/ 08</span></p>
+      </div>
+    </div>
+    <div class="svc-list">
+      <header class="sec-head">
+        <p class="eyebrow">Services · around the tread</p>
+        <h2 class="h2" id="svcH">Eight ways back on the road.</h2>
+        <p class="sec-p">At home, at work or at the roadside, 24 hours a day, 365 days a year.</p>
+      </header>
+      <div class="rail-top" aria-hidden="true"><span>Swipe</span><span class="ind"><b id="railN">01 / 08</b>
+        <svg class="mini" viewBox="0 0 100 100"><g class="mini-spin" id="miniSpin"><circle cx="50" cy="50" r="38" fill="none" stroke="#0A1B30" stroke-width="16"/><circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="12" stroke-dasharray="5 4.95"/><g id="miniIdx"></g><circle cx="50" cy="50" r="24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/></g><path d="M50 0 L43 9 L57 9 Z" fill="#D81800"/></svg></span></div>
+      <ol class="rows" id="rows">
+        <li class="row on" data-i="0"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>01</b></span>
+          <img class="row-img" src="files/assets/images/rm/rm-v4-home.webp" alt="A car on a home driveway" width="1360" height="1020" loading="lazy">
+          <h3>Mobile tyre fitting</h3><p>New tyres fitted at home, at work or at the roadside: premium, mid-range or budget, for cars, vans and 4x4s. The price includes fitting, a new valve, wheel balancing and old-tyre disposal.</p><p class="tag">Michelin · Bridgestone · Continental · Goodyear · Pirelli · Dunlop</p></li>
+        <li class="row" data-i="1"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>02</b></span>
+          <img class="row-img" src="files/assets/images/hero-tyre-change.webp" alt="A technician changing a wheel" width="1500" height="1662" loading="lazy">
+          <h3>Emergency tyre fitting</h3><p>24 hours a day, 365 days a year. When a tyre fails, we come to you and replace it where you are.</p><p class="tag">Day or night · Roadside</p></li>
+        <li class="row" data-i="2"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>03</b></span>
+          <img class="row-img" src="files/assets/images/hero-gloved-hands.webp" alt="Gloved hands checking a tyre" width="1800" height="1200" loading="lazy">
+          <h3>Mobile tyre repair</h3><p>Punctures repaired at home, at work or at the roadside, whenever the tyre can be safely repaired.</p><p class="tag">Punctures</p></li>
+        <li class="row" data-i="3"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>04</b></span>
+          <img class="row-img" src="files/assets/images/rm/rm-v4-carpark.webp" alt="A car in a car park" width="765" height="1020" loading="lazy">
+          <h3>Jump starts</h3><p>Flat battery? We get the engine running again where you’ve stopped.</p><p class="tag">Roadside help</p></li>
+        <li class="row" data-i="4"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>05</b></span>
+          <img class="row-img" src="files/assets/images/rm/rm-v4-country.webp" alt="A 4x4 on a village road" width="765" height="1020" loading="lazy">
+          <h3>Breakdown recovery</h3><p>When it can’t be fixed where it stopped, we recover the vehicle.</p><p class="tag">Roadside help</p></li>
+        <li class="row" data-i="5"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>06</b></span>
+          <img class="row-img" src="files/assets/images/rm/rm-v4-hero.webp" alt="A car parked on a street at night" width="1600" height="900" loading="lazy">
+          <h3>Battery replacement</h3><p>A new battery fitted where you are, at home, at work or at the roadside.</p><p class="tag">Batteries</p></li>
+        <li class="row" data-i="6"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>07</b></span>
+          <img class="row-img" src="files/assets/images/rm/rm-v4-jack.webp" alt="A car on a jack with the wheel off" width="765" height="1020" loading="lazy">
+          <h3>Wheel nut removal</h3><p>Seized wheel nuts and locking wheel nuts without the key, removed so the wheel can come off.</p><p class="tag">Including locking nuts</p></li>
+        <li class="row" data-i="7"><span class="mark" aria-hidden="true"><svg><use href="#i-tread"/></svg><b>08</b></span>
+          <img class="row-img" src="files/assets/images/premium-tread-v.webp" alt="Close-up of tyre tread" width="1400" height="2100" loading="lazy">
+          <h3>Part-worn tyres</h3><p>Part-worn tyres, checked to BS AU 159 before they are fitted.</p><p class="tag">Checked to BS AU 159</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================= READ YOUR SIDEWALL ================= -->
+<section class="spec" id="sidewall" aria-labelledby="specH">
+  <div class="spec-meta"><span>Spec sheet · Tyre size</span><span>Example marking: 205/55 R16 91V</span></div>
+  <div class="spec-head">
+    <div><p class="eyebrow">Tyre size decoder</p><h2 class="h2" id="specH">Read your sidewall.</h2></div>
+    <p class="sec-p">Your tyre size is moulded into the sidewall of every tyre, in a line like the one below. Tap each part to see what it means, then send it to us with your location.</p>
+  </div>
+  <div class="decoder">
+    <svg class="spec-arc" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 58 Q600 -18 1200 58" fill="none" stroke="#0F2540" stroke-opacity=".35" stroke-width="1.5" vector-effect="non-scaling-stroke"/><g id="arcTicks" stroke="#0F2540" stroke-opacity=".35" stroke-width="1.5"></g></svg>
+    <div class="code" role="group" aria-label="Tyre size 205/55 R16 91V. Choose a part to explain it">
+      <button class="part" type="button" data-p="0" aria-pressed="true"><span class="g">205</span><span class="lbl"><i>01</i>Width</span></button>
+      <span class="sl" aria-hidden="true">/</span>
+      <button class="part" type="button" data-p="1" aria-pressed="false"><span class="g">55</span><span class="lbl"><i>02</i>Profile</span></button>
+      <span class="sp" aria-hidden="true"></span><span class="brk" aria-hidden="true"></span>
+      <button class="part" type="button" data-p="2" aria-pressed="false"><span class="g">R16</span><span class="lbl"><i>03</i>Rim</span></button>
+      <span class="sp" aria-hidden="true"></span>
+      <button class="part" type="button" data-p="3" aria-pressed="false"><span class="g">91</span><span class="lbl"><i>04</i>Load</span></button>
+      <button class="part" type="button" data-p="4" aria-pressed="false"><span class="g">V</span><span class="lbl"><i>05</i>Speed</span></button>
+    </div>
+    <div class="explain" id="explain" aria-live="polite">
+      <div><p class="ex-k" id="exK">01 · Width</p><p class="ex-v" id="exV">205 mm</p></div>
+      <p class="ex-t" id="exT">How wide the tyre is from one sidewall to the other, in millimetres. 205 is one of the most common widths on family cars.</p>
+    </div>
+    <div class="size-use"><button class="btn" type="button" id="useSize"><span><small>Field 05 · Tyre size</small><b>Use this size in my callback</b></span></button><p class="size-note" id="sizeNote" aria-live="polite"></p></div>
+  </div>
+  <div class="photo-cta">
+    <p>Not sure? Send us a photo of your tyre on WhatsApp.</p>
+    <a class="btn wa" href="https://wa.me/447842290576?text=Hi%20Road%20Max%2C%20here%20is%20a%20photo%20of%20my%20tyre.%20My%20location%20is%3A%20" target="_blank" rel="noopener"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg><span><small>07842 290576</small><b>Send a photo</b></span></a>
+  </div>
+  <p class="brands">No photo to hand? Your registration works too. We supply premium, mid-range and budget tyres for cars, vans and 4x4s, including Michelin, Bridgestone, Continental, Goodyear, Pirelli and Dunlop. The quoted price includes fitting, a new valve, wheel balancing and old-tyre disposal.</p>
+</section>
+
+<!-- ================= COVERAGE ================= -->
+<section class="cov" id="coverage" aria-labelledby="covH">
+  <div>
+    <p class="eyebrow">Coverage</p>
+    <h2 class="h2" id="covH">Dover &amp; Kent.</h2>
+    <p class="sec-p">Founded in Dover, since 2010. We come to you at home, at work or at the roadside across Kent, 24 hours a day, 365 days a year.</p>
+    <ul class="towns">
+      <li>Dover</li><li>Deal</li><li>Folkestone</li><li>Canterbury</li><li>Margate</li><li>Ramsgate</li><li>Ashford</li><li>Maidstone</li><li>Medway</li><li>Dartford</li><li>Sevenoaks</li><li>Tunbridge Wells</li><li>Whitstable</li><li>Herne Bay</li>
+    </ul>
+  </div>
+  <svg class="map" id="map" viewBox="0 0 1100 710" role="img" aria-label="Map of Kent with coverage rings radiating from Dover">
+    <path id="kent" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.38)" stroke-width="1.5" stroke-linejoin="round" d="M424.5,38.8 L441.8,43.6 L473.5,40.7 L495.0,61.4 L481.6,46.8 L502.1,46.5 L516.4,61.0 L518.5,78.2 L509.2,89.2 L486.2,91.0 L482.0,74.3 L472.8,75.0 L456.6,76.3 L444.5,86.2 L434.7,105.3 L443.3,96.4 L447.9,101.3 L438.7,108.9 L385.0,113.4 L375.2,136.4 L386.8,116.9 L403.4,134.5 L420.9,141.3 L427.2,143.8 L432.5,139.2 L428.7,143.5 L439.6,152.5 L445.3,141.0 L454.0,140.9 L449.5,152.5 L447.5,163.4 L455.8,166.6 L432.0,204.0 L405.2,197.9 L391.4,210.1 L378.4,202.4 L364.4,193.1 L362.4,179.8 L329.3,163.9 L327.3,195.8 L302.6,187.5 L289.4,191.4 L290.3,181.8 L311.5,142.1 L327.2,138.3 L326.1,130.5 L337.4,130.5 L342.6,113.9 L352.6,111.2 L351.7,79.6 L330.2,62.6 L327.9,56.8 L337.4,55.8 L330.6,52.8 L337.9,35.1 L392.9,30.0 L424.5,38.8 Z M644.4,109.5 L679.0,160.1 L641.2,180.1 L623.4,168.5 L613.5,162.1 L612.8,168.2 L601.4,160.6 L609.0,168.4 L600.6,169.7 L577.1,159.9 L548.7,162.5 L547.4,141.9 L525.0,128.3 L517.2,112.3 L524.6,118.4 L531.0,113.3 L526.9,101.0 L536.8,76.5 L559.1,81.8 L566.6,84.1 L589.6,99.6 L625.8,106.1 L644.4,109.5 Z M162.8,39.4 L200.6,67.9 L219.9,59.3 L229.4,55.2 L229.5,55.1 L236.5,71.7 L276.7,79.4 L317.9,74.9 L331.4,65.8 L330.2,62.6 L351.7,79.6 L352.6,111.2 L342.6,113.9 L337.4,130.5 L326.1,130.5 L327.2,138.3 L311.5,142.1 L290.3,181.8 L289.4,191.4 L302.6,187.5 L327.3,195.8 L329.3,163.9 L362.4,179.8 L364.4,193.1 L378.4,202.4 L391.4,210.1 L405.2,197.9 L432.0,204.0 L455.8,166.6 L447.5,163.4 L449.5,152.5 L454.0,140.9 L455.5,140.9 L450.1,157.1 L465.0,131.3 L480.7,158.8 L492.6,138.0 L503.9,137.1 L498.5,151.4 L512.0,146.5 L499.4,106.0 L521.7,101.9 L523.9,107.1 L513.3,113.8 L520.5,129.5 L547.0,149.0 L547.4,170.6 L526.3,190.0 L549.2,171.2 L582.3,175.5 L584.2,189.5 L584.8,177.9 L619.5,178.5 L622.9,180.6 L641.5,191.7 L629.4,209.3 L639.6,200.6 L654.3,208.5 L641.2,194.8 L679.2,190.1 L679.2,190.1 L718.0,186.0 L737.8,167.5 L827.3,157.2 L873.0,152.0 L873.5,151.9 L937.4,150.8 L985.9,137.6 L992.1,136.2 L1015.2,135.6 L1027.2,143.1 L1030.0,175.6 L1030.0,175.6 L1030.0,175.6 L1015.0,212.3 L1013.9,206.2 L1007.8,210.6 L1014.2,214.2 L981.7,208.6 L968.1,228.1 L967.7,228.7 L977.2,226.0 L983.9,252.7 L993.7,291.7 L1001.0,327.9 L1001.3,383.4 L994.2,404.1 L981.0,421.8 L957.0,432.9 L957.1,433.7 L956.9,433.8 L957.4,443.3 L953.9,436.9 L938.4,441.9 L943.0,452.0 L933.8,448.9 L939.2,451.6 L936.4,451.2 L946.4,455.1 L938.9,454.1 L928.3,452.8 L926.9,453.6 L926.0,454.1 L874.6,469.6 L870.9,470.1 L870.1,470.8 L866.5,473.7 L860.1,478.1 L860.0,479.2 L845.6,491.2 L852.2,495.1 L767.9,509.6 L763.8,512.8 L757.1,514.2 L712.0,553.2 L707.1,566.6 L704.3,570.6 L701.6,581.9 L689.1,616.4 L693.7,647.1 L698.7,680.1 L698.7,680.4 L611.7,667.1 L611.6,667.1 L620.7,656.6 L612.3,634.1 L602.0,629.0 L581.8,646.7 L561.6,606.8 L556.5,608.9 L557.8,592.9 L530.6,580.3 L506.6,588.3 L485.5,577.3 L474.5,560.9 L434.9,567.4 L408.7,576.7 L389.9,568.6 L386.9,556.5 L340.6,546.6 L334.2,519.1 L302.4,510.2 L286.9,487.1 L271.0,481.0 L254.6,486.0 L260.4,462.9 L243.2,461.6 L236.5,442.0 L200.2,445.2 L201.4,454.0 L179.4,451.1 L166.4,440.3 L127.7,450.5 L113.3,441.0 L120.0,425.7 L100.5,414.5 L41.6,419.7 L43.5,376.7 L30.0,338.6 L47.4,300.8 L36.2,250.0 L66.9,249.5 L66.4,223.6 L89.7,208.1 L90.1,191.8 L103.2,191.7 L113.9,162.9 L110.8,136.7 L121.2,137.1 L111.6,119.0 L114.5,118.7 L116.6,93.6 L122.6,96.2 L128.6,79.7 L150.2,67.1 L162.8,39.4 Z"/>
+    <g fill="none">
+      <circle class="ring" cx="936.2" cy="436.4" r="640" stroke="rgba(255,255,255,.16)" stroke-width="2" stroke-dasharray="3 9" style="transition-delay:.36s"/>
+      <circle class="ring" cx="936.2" cy="436.4" r="460" stroke="rgba(255,255,255,.24)" stroke-width="3" stroke-dasharray="10 8" style="transition-delay:.24s"/>
+      <circle class="ring" cx="936.2" cy="436.4" r="300" stroke="rgba(255,255,255,.36)" stroke-width="4" stroke-dasharray="14 8" style="transition-delay:.12s"/>
+      <circle class="ring" cx="936.2" cy="436.4" r="150" stroke="#D81800" stroke-width="5" stroke-dasharray="16 8"/>
+    </g>
+    <g id="towns"></g>
+  </svg>
+</section>
+
+<!-- ================= REVIEWS ================= -->
+<section class="rev" id="reviews" aria-labelledby="revH">
+  <div class="rev-head">
+    <div><p class="eyebrow">Google reviews</p><h2 class="h2" id="revH">4.9 from 292 reviews.</h2></div>
+    <div class="rev-nav"><button type="button" id="revPrev" aria-label="Previous review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></button><button type="button" id="revNext" aria-label="Next review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></button></div>
+  </div>
+  <div class="rail" id="revRail" tabindex="0" aria-label="Reviews, scroll sideways">
+    <figure class="q"><blockquote>Called very late at night quick to respond and attend to car, Came earlier than initially said. Very polite man takes great pride in what he does. His van and all his tools were immaculate very clean. Problem fixed within minutes beyond happy and very grateful</blockquote><figcaption><b>Christina K</b> · Google review</figcaption></figure>
+    <figure class="q"><blockquote>Very impressed, blown tyre Sunday morning and was able to replace both fronts within half an hour. Highly recommend and a decent price also!</blockquote><figcaption><b>Anton Lloyd</b> · Google review</figcaption></figure>
+    <figure class="q"><blockquote>KARWAN was exceptional, speedy, polite and efficient. Definitely recommend</blockquote><figcaption><b>Sarah Fulbrook</b> · Google review</figcaption></figure>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="contact" id="contact" aria-labelledby="cH">
+  <div>
+    <p class="eyebrow">24 hours · 365 days a year</p>
+    <h2 class="h2" id="cH">Stuck? Call Road Max.</h2>
+    <a class="big-num" href="tel:01304350200">01304 350200</a>
+    <p class="c-sub">Mobile tyre fitting, repairs and roadside help across Dover &amp; Kent.</p>
+    <div class="c-links">
+      <a class="btn call" href="tel:01304350200"><svg aria-hidden="true"><use href="#i-phone"/></svg><span><small>Call 24/7</small><b>01304 350200</b></span></a>
+      <a class="btn wa" href="https://wa.me/447842290576?text=Hi%20Road%20Max%2C%20I%20need%20help.%20My%20location%20is%3A%20" target="_blank" rel="noopener"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg><span><small>07842 290576</small><b>WhatsApp</b></span></a>
+    </div>
+    <a class="c-mail" href="mailto:info@k1dovertyres.co.uk">info@k1dovertyres.co.uk</a>
+  <div class="cdial" aria-hidden="true">
+      <svg viewBox="0 0 500 500" focusable="false">
+        <defs><path id="dialP" d="M250 250 m-178 0 a178 178 0 1 1 356 0 a178 178 0 1 1 -356 0"/></defs>
+        <circle cx="250" cy="250" r="246" fill="#0A1B30"/>
+        <g class="cdial-spin" id="dialSpin">
+          <circle cx="250" cy="250" r="232" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="24" stroke-dasharray="9 7.2"/>
+          <circle cx="250" cy="250" r="216" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+          <text class="dt"><textPath href="#dialP" textLength="1110" lengthAdjust="spacing">CALL 01304 350200 · 24/7 · CALL 01304 350200 · 24/7 ·</textPath></text>
+          <circle cx="250" cy="250" r="138" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+        </g>
+        <circle cx="250" cy="250" r="120" fill="#0F2540"/>
+        <text x="250" y="244" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="76" fill="#fff">24/7</text>
+        <text x="250" y="284" text-anchor="middle" font-family="Inter" font-weight="600" font-size="15" letter-spacing="3" fill="rgba(255,255,255,.72)">DOVER &amp; KENT</text>
+        <path d="M250 -18 L240 -4 L260 -4 Z" fill="#D81800"/>
+      </svg>
+    </div>
+  </div>
+  <form class="ticket" id="callback" novalidate aria-labelledby="tkH">
+    <div class="tk-meta"><span>Service ticket</span><span>Road Max · 24/7 · Dover &amp; Kent</span></div>
+    <h3 class="tk-t" id="tkH">Request a callback.</h3>
+    <p class="tk-p">Fill in the ticket and we’ll call you back.</p>
+    <div class="fld" data-f="name"><label for="fName"><i>01</i>Name</label><input id="fName" name="name" type="text" autocomplete="name" required aria-describedby="eName"><p class="err" id="eName" hidden></p></div>
+    <div class="fld" data-f="phone"><label for="fPhone"><i>02</i>Phone</label><input id="fPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="ePhone"><p class="err" id="ePhone" hidden></p></div>
+    <div class="fld" data-f="need"><label for="fNeed"><i>03</i>What’s happened / what do you need?</label>
+      <select id="fNeed" name="need" required aria-describedby="eNeed">
+        <option value="">Choose one</option><option>Mobile tyre fitting</option><option>Emergency tyre fitting</option><option>Mobile tyre repair (puncture)</option><option>Jump start</option><option>Breakdown recovery</option><option>Battery replacement</option><option>Wheel nut removal (incl. locking nuts)</option><option>Part-worn tyres</option><option>Something else</option>
+      </select><p class="err" id="eNeed" hidden></p></div>
+    <div class="fld" data-f="where"><label for="fWhere"><i>04</i>Where are you? <em>Optional</em></label><input id="fWhere" name="where" type="text" autocomplete="off" aria-describedby="hWhere"><p class="hint" id="hWhere">Postcode, road or place.</p></div>
+    <div class="fld" data-f="size"><label for="fSize"><i>05</i>Tyre size <em>Optional</em></label><input id="fSize" name="size" type="text" autocomplete="off" aria-describedby="hSize"><p class="hint" id="hSize">For example 205/55 R16 91V. You can add it from the sidewall decoder.</p></div>
+    <div class="tk-send">
+      <button class="btn call tk-btn" type="submit"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg><span><small>Opens WhatsApp</small><b>Send ticket</b></span></button>
+      <p class="tk-note">Sending opens WhatsApp with your details filled in.</p>
+    </div>
+    <p class="tk-alt">In a hurry? <a href="tel:01304350200">Call 01304 350200</a></p>
+  </form>
+</section>
+</main>
+
+<footer class="ft">
+  <img data-rm-logo="v4" data-rm-play="view" class="logo" src="files/assets/images/roadmax/roadmax-logo-compact-white.svg" alt="Road Max">
+  <p>Road Max · 24/7 mobile tyre fitting, repairs and roadside help · Dover &amp; Kent · Founded in Dover, since 2010</p>
+</footer>
+
+<nav class="dial-nav" id="dialNav" aria-label="Sections">
+  <div class="dn">
+    <div class="dn-ring" id="dnRing">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#0A1B30"/><circle cx="50" cy="50" r="41" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="8" stroke-dasharray="4 4.58"/><circle cx="50" cy="50" r="31" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"/></svg>
+    </div>
+    <span class="dn-ptr" aria-hidden="true"></span>
+    <span class="dn-hub" id="dnHub" aria-hidden="true">01</span>
+  </div>
+  <p class="dn-lab" id="dnLab">What’s happened?</p>
+</nav>
+
+<nav class="thumb" id="thumb" aria-label="Quick contact">
+  <a class="tb-call" href="tel:01304350200"><svg aria-hidden="true"><use href="#i-phone"/></svg><span><small>Call 24/7</small><b>01304 350200</b></span></a>
+  <a class="tb-wa" id="thumbWa" href="https://wa.me/447842290576" target="_blank" rel="noopener"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg><span><small>Message</small><b>WhatsApp</b></span></a>
+</nav>
+
+<script src="files/assets/js/roadmax-logo.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+  var phoneMQ = matchMedia('(max-width: 859px)');
+  var RM = reduceMQ.matches;
+  var NS = 'http://www.w3.org/2000/svg';
+  function wa(t) { return 'https://wa.me/447842290576?text=' + encodeURIComponent(t); }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function near(cur, t) { return cur + ((((t - cur) % 360) + 540) % 360 - 180); }
+
+  /* ---------- damped spring: a turn with weight that always comes to rest ---------- */
+  function Spring(apply, k, z) { this.x = 0; this.v = 0; this.t = 0; this.k = k; this.c = 2 * z * Math.sqrt(k); this.apply = apply; this.raf = 0; }
+  Spring.prototype.to = function (t, instant) {
+    this.t = t;
+    if (instant || RM) { if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0; this.x = t; this.v = 0; this.apply(t); return; }
+    if (!this.raf) { var s = this; s.last = performance.now(); s.raf = requestAnimationFrame(function f(now) { s.step(now, f); }); }
+  };
+  Spring.prototype.step = function (now, f) {
+    var dt = Math.min(0.032, (now - this.last) / 1000); this.last = now;
+    this.v += (this.k * (this.t - this.x) - this.c * this.v) * dt; this.x += this.v * dt;
+    if (Math.abs(this.t - this.x) < 0.02 && Math.abs(this.v) < 0.05) { this.x = this.t; this.v = 0; this.apply(this.x); this.raf = 0; return; }
+    this.apply(this.x); this.raf = requestAnimationFrame(f);
+  };
+
+  /* ---------- the tyre object ---------- */
+  var SLOTS = ['205/55 R16 91V', '01 · FLAT TYRE', '02 · PUNCTURE', '03 · BLOWOUT', '04 · LOCKED WHEEL NUT', '05 · FLAT BATTERY'];
+  var FRONT = 270;                                       // top-centre of the horizon
+  function slotAngle(k) { return FRONT + 60 * k; }
+  function P(r, a) { a = a * Math.PI / 180; return [(500 + r * Math.cos(a)).toFixed(2), (500 + r * Math.sin(a)).toFixed(2)]; }
+  function ring(r, a0) { var p = P(r, a0), q = P(r, a0 + 180); return 'M' + p + ' A' + r + ' ' + r + ' 0 1 1 ' + q + ' A' + r + ' ' + r + ' 0 1 1 ' + p; }
+  function arc(r, a, b) { return 'M' + P(r, a) + ' A' + r + ' ' + r + ' 0 0 1 ' + P(r, b); }
+  function frac(th, a0) { return ((((th - a0) % 360) + 360) % 360) / 360; }
+  function buildTyre() {
+    var A0 = 120, rA = 378, rB = 436, h = [];
+    h.push('<svg viewBox="0 0 1000 1000" focusable="false"><defs><clipPath id="alloyClip"><circle cx="500" cy="500" r="326"/></clipPath>');
+    h.push('<path id="rA" d="' + ring(rA, A0) + '"/><path id="rB" d="' + ring(rB, A0) + '"/></defs>');
+    h.push('<circle cx="500" cy="500" r="497" fill="#040B16"/><g fill="#14253C">');
+    for (var i = 0; i < 72; i++) {               // tread blocks; every 9th left open for an index numeral
+      if (i % 9 === 0) continue;
+      var a = i * 5, r1 = (i % 2) ? 476 : 471;
+      h.push('<path d="M' + P(r1, a - 1.7) + 'L' + P(494, a - 1.0) + 'L' + P(494, a + 2.1) + 'L' + P(r1, a + 1.4) + 'Z"/>');
+    }
+    h.push('</g><circle cx="500" cy="500" r="468" fill="#0A1628"/>');
+    h.push('<g fill="none" stroke="#fff"><circle cx="500" cy="500" r="463" stroke-opacity=".12" stroke-width="1.5"/><circle cx="500" cy="500" r="420" stroke-opacity=".1" stroke-width="1.2"/><circle cx="500" cy="500" r="366" stroke-opacity=".08" stroke-width="1.2"/><circle cx="500" cy="500" r="341" stroke-opacity=".14" stroke-width="1.5"/></g>');
+    h.push('<text font-family="Barlow Condensed" font-weight="800" font-size="40" fill="#fff" fill-opacity=".9"><textPath href="#rA" textLength="' + (2 * Math.PI * rA - 6).toFixed(1) + '" lengthAdjust="spacing">ROAD MAX · MOBILE TYRE FITTING · DOVER &amp; KENT · 24/7 · ROAD MAX · MOBILE TYRE FITTING · DOVER &amp; KENT · 24/7 ·</textPath></text>');
+    h.push('<g font-family="Barlow Condensed" font-weight="700" font-size="25" letter-spacing="3" text-anchor="middle">');
+    for (var k = 0; k < SLOTS.length; k++) h.push('<text class="seg' + (k ? '' : ' tech') + '" data-s="' + (k - 1) + '"><textPath href="#rB" startOffset="' + (frac(slotAngle(k), A0) * 100).toFixed(3) + '%">' + SLOTS[k] + '</textPath></text>');
+    h.push('</g><g stroke="#fff" stroke-opacity=".3" stroke-width="2">');
+    for (k = 0; k < 6; k++) { var t1 = P(430, slotAngle(k) + 30), t2 = P(458, slotAngle(k) + 30); h.push('<line x1="' + t1[0] + '" y1="' + t1[1] + '" x2="' + t2[0] + '" y2="' + t2[1] + '"/>'); }
+    h.push('</g><g font-family="Barlow Condensed" font-weight="700" font-size="19" text-anchor="middle">');
+    for (k = 0; k < 8; k++) h.push('<text class="idx" data-k="' + k + '" x="500" y="33" transform="rotate(' + (k * 45 + 90) + ' 500 500)">0' + (k + 1) + '</text>');
+    h.push('</g><circle cx="500" cy="500" r="334" fill="#0B1424"/><circle cx="500" cy="500" r="333" fill="none" stroke="#F5F5F5" stroke-opacity=".5" stroke-width="3"/>');
+    h.push('<image href="files/assets/images/premium-wheel.webp" x="-81" y="-283" width="1088" height="1543" preserveAspectRatio="none" clip-path="url(#alloyClip)"/>');
+    h.push('<circle cx="500" cy="500" r="326" fill="none" stroke="#040B16" stroke-opacity=".7" stroke-width="4"/><circle cx="500" cy="500" r="46" fill="#0F2540"/><circle cx="500" cy="500" r="35" fill="none" stroke="#D81800" stroke-width="4"/></svg>');
+    return h.join('');
+  }
+
+  var tyre = $('#tyre'), spin = $('#spin'), ghost = $('.tyre-ghost'), slotEl = $('#slot'), svc = $('#services');
+  var layer = $('.tyre-layer'), hero = $('#top'), horizon = $('#horizon'), heroCopy = $('.hero-copy'), lis = $$('#triage li');
+  spin.innerHTML = buildTyre();
+  $('#lt1').setAttribute('d', arc(494, 232, 258));
+  $('#lt2').setAttribute('d', arc(455, 236, 254));
+  $('#lt3').setAttribute('d', arc(494, 284, 296));
+  var rot = new Spring(function (x) { spin.style.transform = 'rotate(' + x.toFixed(3) + 'deg)'; }, 150, 0.74);
+  var phone = phoneMQ.matches, choreo = false, sel = -1, svcIdx = 0, mode = 'hero';
+
+  function paintMarks() {
+    $$('.seg', spin).forEach(function (t) { t.classList.toggle('on', sel >= 0 && +t.getAttribute('data-s') === sel && mode === 'hero'); });
+    $$('.idx', spin).forEach(function (t) { t.classList.toggle('on', +t.getAttribute('data-k') === svcIdx && mode === 'svc'); });
+  }
+  function target() { return mode === 'svc' ? -svcIdx * 45 : FRONT - slotAngle(sel + 1); }
+  function retarget(instant) { tyre.classList.toggle('svc', mode === 'svc'); paintMarks(); if (!RM) rot.to(near(rot.x, target()), instant); }
+
+  /* triage choices sit on the curve, just outside the tread (desktop) */
+  function placeChoices() {
+    if (phone) { lis.forEach(function (li) { li.style.transform = ''; }); return; }
+    var W = horizon.clientWidth, D = tyre.offsetWidth || W * 1.6, R = D / 2, top = ghost.offsetTop;
+    var cx = W / 2, cy = top + R, Rc = R + 42;
+    var spread = Math.asin(Math.min(0.37 * W, Rc * 0.6) / Rc) * 180 / Math.PI / 2;
+    lis.forEach(function (li, i) {
+      var a = (FRONT + (i - 2) * spread) * Math.PI / 180;
+      var x = cx + Rc * Math.cos(a), y = cy + Rc * Math.sin(a);
+      li.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + ((i - 2) * spread).toFixed(2) + 'deg)';
+    });
+  }
+
+  function setLayout() {
+    phone = phoneMQ.matches;
+    choreo = !phone && !RM;
+    document.documentElement.classList.toggle('choreo', choreo);
+    if (!choreo) { layer.style.clipPath = ''; tyre.style.transform = ''; tyre.style.visibility = ''; tyre.style.setProperty('--q', 0); mode = 'hero'; }
+    placeChoices();
+    retarget(true);
+    update();
+  }
+
+  /* ---------- hero triage ---------- */
+  var T = [
+    { k: 'flat tyre', w: 'Hi Road Max, I have a flat tyre. My location is: ' },
+    { k: 'puncture', w: 'Hi Road Max, I have a puncture. My location is: ' },
+    { k: 'blowout', w: 'Hi Road Max, I have had a blowout. My location is: ' },
+    { k: 'locked wheel nut', w: 'Hi Road Max, I have a locked wheel nut and no key. My location is: ' },
+    { k: 'flat battery', w: 'Hi Road Max, I have a flat battery. My location is: ' }
+  ];
+  var NEEDS = ['Emergency tyre fitting', 'Mobile tyre repair (puncture)', 'Emergency tyre fitting', 'Wheel nut removal (incl. locking nuts)', 'Jump start'];
+  var fNeed = $('#fNeed');
+  var btns = $$('.t'), answers = $$('.ans'), waBtn = $('#heroWa'), waNote = $('#waNote'), thumbWa = $('#thumbWa');
+  function choose(i) {
+    if (i === sel) return;
+    var prev = $('.ans.is-on'), next = answers[i + 1];
+    sel = i;
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-i') === i)); });
+    if (prev && prev !== next) {
+      prev.classList.remove('is-on', 'is-in');
+      if (!RM) { prev.classList.add('is-out'); setTimeout(function () { prev.classList.remove('is-out'); }, 240); }
+    }
+    next.classList.remove('is-out'); next.classList.add('is-on');
+    if (!RM) { next.classList.remove('is-in'); void next.offsetWidth; next.classList.add('is-in'); }
+    waBtn.href = thumbWa.href = wa(T[i].w);
+    fNeed.value = NEEDS[i];
+    waNote.textContent = phone ? 'Message ready' : 'Message ready: ' + T[i].k; waBtn.setAttribute('aria-label', 'WhatsApp us about a ' + T[i].k + ', message ready');
+    if (mode === 'hero') retarget(false);
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { choose(+b.getAttribute('data-i')); }); });
+  var sx = null;                                       // phones: swipe along the arc turns to the next / previous marking
+  tyre.addEventListener('pointerdown', function (e) { if (phone) sx = e.clientX; });
+  tyre.addEventListener('pointerup', function (e) {
+    if (sx === null) return; var dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) < 28) return;
+    choose(sel < 0 ? (dx < 0 ? 0 : 4) : (sel + (dx < 0 ? 1 : -1) + 5) % 5);
+  });
+
+  /* ---------- services choreography + section dial ---------- */
+  var rows = $$('.row'), photos = $$('.stage-sticky img'), capN = $('#capN'), capT = $('#capT');
+  function setSvc(i) {
+    if (i === svcIdx) return; svcIdx = i;
+    rows.forEach(function (r, k) { r.classList.toggle('on', k === i); });
+    photos.forEach(function (p, k) { p.classList.toggle('on', k === i); });
+    capN.textContent = '0' + (i + 1); capT.textContent = $('h3', rows[i]).textContent;
+    if (mode === 'svc') retarget(false);
+  }
+  var SECTIONS = [['top', 'What’s happened?'], ['services', 'Services'], ['sidewall', 'Tyre size'], ['coverage', 'Coverage'], ['reviews', 'Reviews'], ['contact', 'Call us'], ['callback', 'Callback']];
+  var dnRing = $('#dnRing'), dnLab = $('#dnLab'), dnHub = $('#dnHub'), dnBtns = [], dnIdx = -1;
+  var dn = new Spring(function (x) { dnRing.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 110, 0.72);
+  SECTIONS.forEach(function (s, k) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'dn-t'; b.style.setProperty('--a', (k * 360 / SECTIONS.length) + 'deg');
+    b.setAttribute('aria-label', 'Go to ' + s[1]); b.innerHTML = '<i></i>';
+    b.addEventListener('click', function () { document.getElementById(s[0]).scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); });
+    dnRing.appendChild(b); dnBtns.push(b);
+  });
+  function setDial(k) {
+    if (k === dnIdx) return; dnIdx = k;
+    dnBtns.forEach(function (b, j) { b.setAttribute('aria-current', String(j === k)); });
+    dnLab.textContent = SECTIONS[k][1]; dnLab.style.visibility = k ? '' : 'hidden'; dnHub.textContent = '0' + (k + 1);
+    dn.to(near(dn.x, -k * 360 / SECTIONS.length));
+  }
+
+  var ticking = false;
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  function update() {
+    ticking = false;
+    var vh = innerHeight, k, best = 0, bd = 1e9;
+    for (k = 0; k < SECTIONS.length; k++) if (document.getElementById(SECTIONS[k][0]).getBoundingClientRect().top <= vh * (k === 6 ? 0.12 : 0.45)) best = k;
+    setDial(best);
+    if (phone) return;
+    best = 0;
+    rows.forEach(function (r, j) { var b = r.getBoundingClientRect(), d = Math.abs((b.top + b.bottom) / 2 - vh * 0.5); if (d < bd) { bd = d; best = j; } });
+    setSvc(best);
+    if (!choreo) return;
+    /* phase 1: the horizon shrinks into a whole tyre, its crown pinned to the arc line (so it stays inside the
+       original horizon and never crosses the copy or the choices). phase 2: it travels into the services stage. */
+    var D = tyre.offsetWidth, g = ghost.getBoundingClientRect(), s = slotEl.getBoundingClientRect();
+    var d = Math.min(s.width * 0.74, s.height * 0.6), tx = s.left + (s.width - d) / 2, ty = s.top + s.height * 0.5 - d / 2;
+    var y0 = scrollY, heroH = hero.offsetHeight;
+    var p1 = smooth(0, heroH * 0.62, y0), p2 = smooth(heroH * 0.62, heroH, y0);
+    var size1 = lerp(g.width, d, p1), x1 = g.left + (g.width - size1) / 2, top1 = g.top;
+    var size = lerp(size1, d, p2), x = lerp(x1, tx, p2), y = lerp(top1, ty, p2);
+    tyre.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + (size / D).toFixed(4) + ')';
+    tyre.style.visibility = (y + size < -20 || y > vh + 20) ? 'hidden' : '';
+    tyre.style.setProperty('--q', smooth(0.6, 1, p2).toFixed(3));
+    var hb = clamp(hero.getBoundingClientRect().bottom, 0, vh), sr = s.right;   // never over the services copy column
+    layer.style.clipPath = 'polygon(0 0,100% 0,100% ' + hb + 'px,' + sr + 'px ' + hb + 'px,' + sr + 'px 100%,0 100%)';
+    var m = p2 > 0.5 ? 'svc' : 'hero';
+    if (m !== mode) { mode = m; retarget(false); }
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', function () { placeChoices(); onScroll(); });
+  phoneMQ.addEventListener('change', setLayout);
+  reduceMQ.addEventListener('change', function () { RM = reduceMQ.matches; setLayout(); });
+
+  /* ---------- phone services rail + turning tyre-segment indicator ---------- */
+  var railEl = $('#rows'), railN = $('#railN'), miniSpin = $('#miniSpin'), mi = $('#miniIdx');
+  for (var j = 0; j < 8; j++) { var l = document.createElementNS(NS, 'rect'); l.setAttribute('x', 48); l.setAttribute('y', 8); l.setAttribute('width', 4); l.setAttribute('height', 14); l.setAttribute('fill', j ? 'rgba(255,255,255,.75)' : '#D81800'); l.setAttribute('transform', 'rotate(' + j * 45 + ' 50 50)'); mi.appendChild(l); }
+  var mini = new Spring(function (x) { miniSpin.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 120, 0.72), railIdx = 0;
+  railEl.addEventListener('scroll', function () {
+    if (!phone) return;
+    var w = rows[0].getBoundingClientRect().width + 12, i = clamp(Math.round(railEl.scrollLeft / w), 0, rows.length - 1);
+    if (i === railIdx) return; railIdx = i;
+    railN.textContent = '0' + (i + 1) + ' / 08';
+    rows.forEach(function (r, k) { r.classList.toggle('on', k === i); });
+    mini.to(-i * 45);
+  }, { passive: true });
+
+  /* ---------- sidewall decoder ---------- */
+  var PARTS = [
+    ['01 · Width', '205 mm', 'How wide the tyre is from one sidewall to the other, in millimetres. 205 is one of the most common widths on family cars.'],
+    ['02 · Profile', '55%', 'The height of the sidewall as a percentage of the width. Here it is 55% of 205 mm, about 113 mm. A lower number means a lower, firmer sidewall.'],
+    ['03 · Rim', 'R16', 'R means radial construction, which almost every car tyre uses today. 16 is the diameter of the wheel it fits, in inches.'],
+    ['04 · Load index', '615 kg', 'Load index 91 means each tyre can carry up to 615 kg. Fit the load index your vehicle needs, or higher.'],
+    ['05 · Speed rating', '149 mph', 'V means the tyre is rated for speeds up to 149 mph (240 km/h). Fit at least the rating your vehicle needs.']
+  ];
+  var parts = $$('.part'), exK = $('#exK'), exV = $('#exV'), exT = $('#exT'), exBox = $('#explain'), cur = 0;
+  function explain(i) {
+    if (i === cur) return; cur = i;
+    parts.forEach(function (p) { p.setAttribute('aria-pressed', String(+p.getAttribute('data-p') === i)); });
+    exK.textContent = PARTS[i][0]; exV.textContent = PARTS[i][1]; exT.textContent = PARTS[i][2];
+    if (!RM) { exBox.classList.remove('ex-swap'); void exBox.offsetWidth; exBox.classList.add('ex-swap'); }
+  }
+  var hoverable = matchMedia('(hover: hover)').matches;
+  parts.forEach(function (p) {
+    var i = +p.getAttribute('data-p');
+    p.addEventListener('click', function () { explain(i); });
+    p.addEventListener('focus', function () { explain(i); });
+    if (hoverable) p.addEventListener('mouseenter', function () { explain(i); });
+  });
+  var at = $('#arcTicks');
+  for (j = 0; j <= 60; j++) { var x = j * 20, yy = 58 - 38 * (1 - Math.pow((x - 600) / 600, 2)), ln = document.createElementNS(NS, 'line'); ln.setAttribute('x1', x); ln.setAttribute('x2', x); ln.setAttribute('y1', yy); ln.setAttribute('y2', yy + (j % 5 ? 6 : 13)); ln.setAttribute('vector-effect', 'non-scaling-stroke'); at.appendChild(ln); }
+
+  /* ---------- coverage map towns ---------- */
+  var TOWNS = [['Deal', 998.6, 329.3, 'w'], ['Folkestone', 834.3, 489, 's'], ['Canterbury', 770.1, 264.1, 'e'], ['Whitstable', 732.4, 173, 's'], ['Herne Bay', 804.9, 159.1, 'e'], ['Margate', 987.7, 149.7, 'nw'], ['Ramsgate', 1008.8, 201.3, 'w'], ['Ashford', 625.8, 415.3, 'e'], ['Maidstone', 380.8, 273.4, 'e'], ['Medway', 380.8, 162.5, 's'], ['Dartford', 159.9, 76.5, 'e'], ['Sevenoaks', 193.1, 194.2, 'e'], ['Tunbridge Wells', 192.4, 431.7, 'e']];
+  var html = '';
+  TOWNS.forEach(function (t) {
+    var o = { e: [12, 7, 'start'], w: [-12, 7, 'end'], s: [0, 32, 'middle'], nw: [-12, -10, 'end'] }[t[3]];
+    html += '<circle cx="' + t[1] + '" cy="' + t[2] + '" r="5" fill="#fff" fill-opacity=".85"/><text class="lab" x="' + (t[1] + o[0]) + '" y="' + (t[2] + o[1]) + '" text-anchor="' + o[2] + '">' + t[0] + '</text>';
+  });
+  $('#towns').innerHTML = html + '<circle cx="936.2" cy="436.4" r="11" fill="#D81800"/><text class="dover" x="914" y="420" text-anchor="end">DOVER</text>';
+
+  /* ---------- reveals: map rings expand once, contact dial turns once and settles ---------- */
+  var dialSpin = $('#dialSpin'), cdial = new Spring(function (x) { dialSpin.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 60, 0.7);
+  if (!RM) cdial.to(-50, true);
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        if (e.target.id === 'map') e.target.classList.add('in'); else cdial.to(0);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.35 });
+    io.observe($('#map')); io.observe($('.cdial'));
+    var thumb = $('#thumb');
+    var heroGone = false, sendSeen = false;            // the thumb bar steps aside while the ticket's submit is on screen
+    function thumbState() { thumb.classList.toggle('show', heroGone && !sendSeen); }
+    new IntersectionObserver(function (es) { var e = es[0]; heroGone = !e.isIntersecting && e.boundingClientRect.top < 0; thumbState(); }).observe($('#heroCta'));
+    new IntersectionObserver(function (es) { sendSeen = es[0].isIntersecting; thumbState(); }).observe($('.tk-send'));
+  } else { $('#map').classList.add('in'); cdial.to(0, true); }
+
+  /* ---------- reviews rail: drag with a mouse; arrows step one quote ---------- */
+  var rail = $('#revRail'), qs = $$('.q', rail), dragX = null, startL = 0, moved = false;
+  function step(dir) {
+    var w = qs[0].getBoundingClientRect().width + parseFloat(getComputedStyle(rail).columnGap || 0);
+    rail.scrollTo({ left: Math.round(rail.scrollLeft / w + dir) * w, behavior: RM ? 'auto' : 'smooth' });
+  }
+  $('#revPrev').addEventListener('click', function () { step(-1); });
+  $('#revNext').addEventListener('click', function () { step(1); });
+  rail.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; dragX = e.clientX; startL = rail.scrollLeft; moved = false; });
+  addEventListener('pointermove', function (e) { if (dragX === null) return; var dx = e.clientX - dragX; if (Math.abs(dx) > 4) { moved = true; rail.classList.add('drag'); } rail.scrollLeft = startL - dx; });
+  addEventListener('pointerup', function () { if (dragX === null) return; dragX = null; if (moved) { rail.classList.remove('drag'); step(0); } });
+
+  /* ---------- callback ticket ---------- */
+  var form = $('#callback'), fName = $('#fName'), fPhone = $('#fPhone'), fWhere = $('#fWhere'), fSize = $('#fSize');
+  $('#useSize').addEventListener('click', function () {
+    fSize.value = '205/55 R16 91V';
+    $('#sizeNote').innerHTML = 'Added to field 05 of your callback ticket. <a href="#callback">Go to the ticket</a>';
+  });
+  function setErr(input, msg) {
+    var e = document.getElementById(input.getAttribute('aria-describedby'));
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    e.textContent = msg || ''; e.hidden = !msg;
+  }
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var name = fName.value.trim(), ph = fPhone.value.trim(), digits = ph.replace(/[^0-9]/g, ''), need = fNeed.value, bad = [];
+    setErr(fName, name ? '' : 'Please enter your name.'); if (!name) bad.push(fName);
+    var phMsg = !ph ? 'Please enter a phone number we can call.' : (digits.length < 10 || digits.length > 13) ? 'Please enter a full phone number, for example 07700 900123.' : '';
+    setErr(fPhone, phMsg); if (phMsg) bad.push(fPhone);
+    setErr(fNeed, need ? '' : 'Please choose what has happened.'); if (!need) bad.push(fNeed);
+    if (bad.length) { bad[0].focus(); return; }
+    var msg = 'Hi Road Max, please call me back.\nName: ' + name + '\nPhone: ' + ph + '\nNeed: ' + need;
+    if (fWhere.value.trim()) msg += '\nLocation: ' + fWhere.value.trim();
+    if (fSize.value.trim()) msg += '\nTyre size: ' + fSize.value.trim();
+    var url = 'https://wa.me/447842290576?text=' + encodeURIComponent(msg);
+    var flds = $$('.fld', form);
+    /* open WhatsApp synchronously inside the submit gesture (iOS Safari blocks opens from timers).
+       'noopener' as a feature makes window.open return null even on success, so the opener is cut by hand,
+       and a null return then really means blocked: fall back to navigating this tab. */
+    var win = window.open(url, '_blank');
+    if (win) { try { win.opener = null; } catch (x) {} } else { location.href = url; }
+    if (RM) { flds.forEach(function (f) { f.classList.add('lit'); }); return; }
+    flds.forEach(function (f, j) { setTimeout(function () { f.classList.add('lit'); }, j * 80); });   // purely visual: markings light up in sequence, 400 ms
+    setTimeout(function () { flds.forEach(function (f) { f.classList.remove('lit'); }); }, 1000);
+  });
+
+  setLayout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeChoices);
+})();
+</script>
+<script src="version-bar.js" defer></script>
+</body>
+</html>

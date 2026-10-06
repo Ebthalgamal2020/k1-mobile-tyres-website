@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Road Max — Version switcher</title>
+<link rel="icon" href="files/assets/images/roadmax/roadmax-favicon.svg" type="image/svg+xml">
+<style>
+  :root { --bar: #0b1220; --line: rgba(255,255,255,.14); --mute: #9aa6b4; --red: #D81800; --gold: #FFB800; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { display: flex; flex-direction: column; background: var(--bar); color: #fff; font: 600 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .top { flex: none; display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-bottom: 1px solid var(--line); }
+  .brand { flex: none; display: flex; align-items: center; gap: 8px; font-size: 14px; letter-spacing: .02em; white-space: nowrap; }
+  .brand img { width: 26px; height: 26px; }
+  .brand span { color: var(--mute); font-weight: 500; }
+  .vers { flex: 1; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+  .vers::-webkit-scrollbar { display: none; }
+  .pair { flex: none; display: flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 8px; }
+  .pair b { padding: 0 8px 0 6px; font-size: 14px; }
+  .pair a { display: flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 5px; color: #d6dde6; text-decoration: none; white-space: nowrap; }
+  .pair a:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .pair a[aria-current="page"] { background: #fff; color: #0b1220; }
+  .pair a.prev[aria-current="page"] { background: var(--gold); }
+  .pair:has(a[aria-current="page"]) { border-color: rgba(255,255,255,.5); }
+  a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .open { flex: none; color: var(--mute); text-decoration: none; font-weight: 500; white-space: nowrap; padding: 10px 4px; }
+  .open:hover { color: #fff; }
+  main { flex: 1; min-height: 0; }
+  iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+  @media (max-width: 760px) {
+    .top { flex-wrap: wrap; gap: 8px 10px; padding: 8px 10px; }
+    .brand span, .open { display: none; }
+    .vers { order: 3; flex-basis: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; overflow: visible; }
+    .pair { min-width: 0; }
+    .pair b { padding: 0 4px 0 4px; font-size: 13px; }
+    .pair a { flex: 1; justify-content: center; height: 44px; padding: 0 6px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="files/assets/images/roadmax/roadmax-favicon.svg" alt="">Road Max <span>· versions</span></div>
+  <nav class="vers" id="vers" aria-label="Choose a version"></nav>
+  <a class="open" id="open" href="#" target="_blank" rel="noopener">Open full page ↗</a>
+</header>
+<main><iframe id="view" title="Selected version"></iframe></main>
+<script>
+(function () {
+  var V = ['v1', 'v3', 'v4', 'v5'];
+  var nav = document.getElementById('vers'), view = document.getElementById('view'), open = document.getElementById('open');
+  function file(id) { var m = id.split('-'); return m[0] + '-prototype' + (m[1] ? '-previous' : '') + '.html'; }
+  nav.innerHTML = V.map(function (v) {
+    return '<div class="pair"><b>' + v.toUpperCase() + '</b>' +
+      '<a href="#' + v + '" data-id="' + v + '">Current</a>' +
+      '<a class="prev" href="#' + v + '-previous" data-id="' + v + '-previous">Previous</a></div>';
+  }).join('');
+  function show() {
+    var id = (location.hash || '#v5').slice(1);
+    if (!/^v[1345](-previous)?$/.test(id)) id = 'v5';
+    var src = file(id);
+    if (view.getAttribute('src') !== src) view.setAttribute('src', src);
+    open.href = src;
+    document.title = id.toUpperCase().replace('-PREVIOUS', ' Previous') + ' — Road Max versions';
+    nav.querySelectorAll('a').forEach(function (a) {
+      var on = a.getAttribute('data-id') === id;
+      if (on) { a.setAttribute('aria-current', 'page'); a.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+      else a.removeAttribute('aria-current');
+    });
+  }
+  addEventListener('hashchange', show);
+  show();
+})();
+</script>
+</body>
+</html>

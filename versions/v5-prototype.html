@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Road Max V5 · The Call-Out (round 3 prototype)</title>
+<meta name="theme-color" content="#0F2540">
+<link rel="icon" href="files/assets/images/roadmax/roadmax-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* =====================================================================
+   V5 · The Call-Out, round 3: FLOWING / CINEMATIC / ROAD-DRIVEN.
+   One continuous bezier road (SVG, built from lane markers in the layout) flows down the page.
+   Text never sits on it: every chapter leaves a lane for it. The wheel rolls along the path.
+   Shape language: road-sign capsules, bent chevrons, curved crests between chapters.
+   Everything is fluid from 320 to 3840px.
+   ===================================================================== */
+:root {
+  --red: #D81800; --red-d: #B51400;
+  --navy: #183860; --deep: #0F2540; --deeper: #0A1C33;
+  --grey: #F5F5F5;
+  --w78: rgba(255,255,255,.78); --w60: rgba(255,255,255,.6); --w14: rgba(255,255,255,.14);
+  --wa: #25D366;
+  --disp: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --body: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --g: clamp(16px, 4vw, 160px);              /* fluid gutter */
+  --gl: var(--g);                            /* left gutter (rail adds room on desktop) */
+  --rw: clamp(16px, 1.6vw, 60px);            /* road width: a narrow, low-contrast lane */
+  --lane: clamp(56px, 8vw, 300px);           /* the clear lane left for it in 03 and 04 */
+  --wd: clamp(40px, 3.4vw, 130px);           /* the small wheel */
+  --crest: clamp(22px, 3.2vw, 130px);        /* height of the crest between chapters */
+  --ease: cubic-bezier(.2,.8,.2,1);
+  --hdr: clamp(64px, 5.2vw, 170px);
+  --bt: clamp(15px, 1vw, 34px);              /* button type */
+  --bh: clamp(50px, 3.4vw, 120px);           /* button height */
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--hdr); }
+body { margin: 0; background: var(--deep); color: #fff; font: 400 clamp(17px, .25vw + 13.4px, 20px)/1.65 var(--body); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4, p { margin: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ic { width: 1.1em; height: 1.1em; flex: none; }
+.ic-wa { color: var(--wa); }
+
+/* ---------- road-sign capsule: the one button shape ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .55em; min-height: var(--bh); padding: 0 1.5em;
+  border-radius: 999px; font: 600 var(--bt)/1 var(--body); letter-spacing: .01em; white-space: nowrap;
+  background: var(--bg, var(--red)); color: #fff; transition: background-color .2s; }
+.btn-red { --bg: var(--red); }
+.btn-deep { --bg: var(--deep); }
+.btn-white { --bg: #fff; color: var(--deep); }
+.btn-line { --bg: transparent; box-shadow: inset 0 0 0 2px currentColor; }
+@media (hover: hover) {
+  .btn-red:hover { --bg: var(--red-d); } .btn-deep:hover { --bg: var(--deeper); }
+  .btn-white:hover { --bg: var(--grey); } .btn-line:hover { --bg: rgba(255,255,255,.08); }
+}
+/* chapter marker: a mile-post capsule */
+.mk { display: flex; align-items: center; gap: .9em; font-size: clamp(12px, .78vw, 26px); }
+.mk-n { display: inline-grid; place-items: center; min-width: 2.9em; height: 2em; padding: 0 .7em; border-radius: 999px; box-shadow: inset 0 0 0 1.5px currentColor;
+  font: 600 1em/1 var(--body); letter-spacing: .04em; }
+.mk-t { font: 500 1em/1 var(--body); letter-spacing: .2em; text-transform: uppercase; }
+/* bent chevron (the road's curve, as an arrow) */
+.chev { display: inline-block; width: .34em; height: .62em; vertical-align: -.02em; margin: 0 .22em 0 .18em; color: var(--red); }
+
+/* =====================================================================
+   THE ROAD (one SVG over the whole story, under the words)
+   ===================================================================== */
+main { position: relative; overflow: clip; }
+section, .story, .run { position: relative; }
+.roadsvg { position: absolute; left: 0; top: 0; width: 100%; z-index: 1; pointer-events: none; overflow: visible; }
+.roadsvg .rd { fill: none; stroke-linecap: butt; stroke-linejoin: round; }
+.roadsvg .cl { fill: none; stroke: #fff; stroke-linecap: butt; }
+.roadsvg .tp { font: 500 10px var(--body); letter-spacing: .03em; fill: rgba(24,56,96,.72); }
+.lift { position: relative; z-index: 2; }
+.rp { position: absolute; left: var(--x); top: var(--y); width: 0; height: 0; pointer-events: none; }
+.rollwheel { position: absolute; left: 0; top: 0; z-index: 3; width: 100px; height: auto; aspect-ratio: 1; pointer-events: none; will-change: transform;
+  clip-path: circle(47.5% at 50% 50%); filter: drop-shadow(0 8px 12px rgba(0,0,0,.4)); opacity: 0; transition: opacity .3s; }
+.rollwheel.on { opacity: 1; }
+.probe { position: absolute; visibility: hidden; height: 0; }
+.probe.rw { width: var(--rw); } .probe.cr { width: var(--crest); } .probe.wd { width: var(--wd); }
+
+/* the one photo grade: monochrome, navy multiply, lifted contrast */
+.ph { position: absolute; inset: 0; overflow: hidden; background: var(--deep); z-index: 0; }
+.ph img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.28) brightness(.92); }
+.ph::after { content: ""; position: absolute; inset: 0; background: var(--navy); mix-blend-mode: multiply; }
+
+/* =====================================================================
+   HEADER + JOURNEY RAIL
+   ===================================================================== */
+.hdr { position: fixed; inset: 0 0 auto; z-index: 50; height: var(--hdr); display: flex; align-items: center; gap: clamp(16px, 1.8vw, 60px);
+  padding: 0 var(--g) 0 var(--gl); background: var(--deep); box-shadow: 0 1px 0 var(--w14); }
+.hdr .brand { display: flex; align-items: center; min-height: 48px; flex: none; }
+.hdr .rm-logo { height: clamp(30px, 2.6vw, 92px); width: auto; }
+.now { display: flex; align-items: center; gap: .6em; min-height: 48px; white-space: nowrap; font: 500 clamp(12px, .78vw, 26px)/1 var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--w78); }
+.now b { color: #fff; font-weight: 600; }
+.now svg { width: .5em; height: .9em; color: var(--red); }
+.hdr .sp { flex: 1; }
+.hdr .tl { display: inline-flex; align-items: center; gap: .5em; min-height: 48px; font: 500 clamp(14px, .92vw, 30px)/1 var(--body); color: var(--w78); white-space: nowrap; }
+@media (hover: hover) { .hdr .tl:hover { color: #fff; } }
+.hdr .btn { min-height: clamp(48px, 3vw, 106px); padding: 0 1.3em; }
+.chap-btn, .chap-list { display: none; }
+
+.rail { position: fixed; left: calc(var(--g) * .35); top: 50%; translate: 0 -50%; z-index: 40; height: min(52vh, 40vw); width: clamp(28px, 2vw, 70px); }
+.rail::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--w14); }
+.rail .fill { position: absolute; left: 50%; top: 0; width: 2px; margin-left: -1px; height: 100%; background: var(--red); transform-origin: top; transform: scaleY(var(--p, 0)); }
+.rail a, .rail span.off { position: absolute; left: 0; width: 100%; aspect-ratio: 1; display: grid; place-items: center; translate: 0 -50%; border-radius: 50%;
+  font: 600 clamp(11px, .72vw, 24px)/1 var(--body); color: var(--w60); background: var(--deep); box-shadow: 0 0 0 2px var(--w14); }
+.rail span.off { opacity: .45; }
+.rail a.on { color: #fff; background: var(--red); box-shadow: none; }
+
+/* =====================================================================
+   01 STOPPED
+   ===================================================================== */
+.hero { height: max(640px, 100svh); background: var(--deep); }
+.hero .art { position: absolute; inset: 0; }
+.hero .ph img { object-position: 64% 50%; transform: scale(1.04); transition: transform 1.6s var(--ease); }
+.go .hero .ph img { transform: none; }
+.hero .scrim { position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(90deg, rgba(15,37,64,.95) 0%, rgba(15,37,64,.86) 40%, rgba(15,37,64,.4) 64%, rgba(15,37,64,.25) 100%); }
+.hero .copy { position: absolute; left: var(--gl); bottom: calc(var(--crest) + clamp(36px, 6vh, 160px)); width: 50%; }
+.hero .mk { margin-bottom: clamp(18px, 2.6vh, 60px); color: var(--w78); }
+.hero h1 { font-family: var(--disp); text-transform: uppercase; }
+.hero h1 .ln { display: block; overflow: hidden; }
+.hero h1 .ln > span { display: block; animation: line-up .4s cubic-bezier(.2,.75,.2,1) both; }
+.hero h1 .ln:nth-child(2) > span { animation-delay: .04s; }
+.hero h1 .ln:nth-child(3) > span { animation-delay: .08s; }
+@keyframes line-up { from { transform: translateY(102%); } to { transform: none; } }
+.hero h1 .big { font-weight: 800; font-size: clamp(44px, min(6.6vw, 12vh), 300px); line-height: .9; letter-spacing: 0; }
+.hero h1 .ln:nth-child(3) { margin-top: clamp(16px, 1.6vw, 56px); padding: 0 0 .06em; }
+.sign { display: inline-block; padding: .62em 1.15em; border-radius: 999px; background: var(--red); font: 600 clamp(16px, 1.2vw, 44px)/1 var(--body); text-transform: none; letter-spacing: .01em; }
+.hero .sub { margin-top: clamp(20px, 2.8vh, 70px); max-width: 34em; font-size: clamp(17px, .3vw + 13px, 22px); line-height: 1.55; color: var(--w78); }
+.lock { display: inline-flex; align-items: center; gap: .3em; margin-top: clamp(26px, 3.6vh, 90px); min-height: 56px; font: 700 clamp(36px, min(3.7vw, 6.6vh), 150px)/1 var(--disp); }
+.lock .tab { display: inline-flex; align-items: center; gap: .2em; height: 1em; padding: 0 .4em; border-radius: 999px; background: var(--red); transition: background-color .2s; }
+.lock .tab svg { width: .36em; height: .36em; }
+.lock .tab span { font: 600 .3em/1 var(--body); letter-spacing: .01em; }
+.lock .num { line-height: .8; letter-spacing: -.004em; white-space: nowrap; }
+.lock .num .a { color: var(--w78); }
+@media (hover: hover) { .lock:hover .tab { background: var(--red-d); } }
+.hero .alt { display: flex; align-items: center; gap: .6em; margin-top: clamp(10px, 1vh, 30px); min-height: 48px; width: max-content; font: 400 clamp(15px, .95vw, 32px)/1 var(--body); color: var(--w78); }
+.hero .alt b { color: #fff; font-weight: 600; border-bottom: 2px solid var(--w60); padding-bottom: 2px; }
+.hero .copy .fade { animation: fade-in .3s ease .12s both; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* =====================================================================
+   02 WHAT HAPPENED?
+   ===================================================================== */
+.story { height: clamp(560px, 46vw, 94vh); background: var(--deep); }
+.story .ph { left: 38%; z-index: 0; }        /* clipped along the road's right edge by script */
+.story .ph img { object-position: 50% 62%; transform: scale(1.08); transition: transform 1.4s var(--ease); }
+.story.in .ph img { transform: none; }
+.story .mk { position: absolute; left: var(--gl); top: calc(var(--crest) + clamp(24px, 3vw, 110px)); color: #fff; }
+.story .tell { position: absolute; left: var(--gl); bottom: calc(var(--crest) + clamp(36px, 4.6vw, 170px)); width: 42%; }
+.story .live { display: flex; align-items: center; gap: .6em; font: 500 clamp(12px, .78vw, 26px)/1 var(--body); letter-spacing: .2em; text-transform: uppercase; color: var(--w78); }
+.story h3 { margin-top: .6em; font: 600 clamp(28px, 2.9vw, 112px)/1.08 var(--body); letter-spacing: -.02em; }
+.story p { margin-top: 1.1em; max-width: 30em; color: var(--w78); }
+.story .btn { margin-top: clamp(26px, 2.4vw, 84px); }
+
+.run { background: var(--grey); color: var(--deep); padding: calc(var(--crest) + clamp(140px, 14vw, 520px)) var(--g) clamp(180px, 16vw, 600px) var(--gl); }
+.run .col { width: 70%; }
+.run h3 { font: 600 clamp(26px, 2.4vw, 92px)/1.1 var(--body); letter-spacing: -.02em; color: var(--deep); margin-bottom: clamp(26px, 2.6vw, 96px); max-width: 18em; }
+.run-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .6em 2.4em; margin-bottom: clamp(16px, 1.4vw, 50px); }
+.run-head p { font: 500 clamp(12px, .78vw, 26px)/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: #4A5B70; }
+.run-head p.hint { letter-spacing: .01em; text-transform: none; font-size: clamp(15px, .95vw, 32px); }
+.fixes { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(28px, 3vw, 110px);
+  font: 500 clamp(19px, 1.45vw, 52px)/1.3 var(--body); letter-spacing: -.01em; }
+.fixes li { border-top: 1px solid rgba(15,37,64,.14); }
+.fixes button { display: flex; align-items: center; gap: .7em; width: 100%; min-height: 48px; padding: .75em 0; text-align: left; color: var(--deep); transition: color .2s; }
+.fixes button::before { content: ""; flex: none; width: .42em; height: .42em; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(15,37,64,.4); transition: background-color .2s, box-shadow .2s; }
+.fixes button[aria-pressed="true"] { font-weight: 600; }
+.fixes button[aria-pressed="true"]::before { background: var(--red); box-shadow: none; }
+@media (hover: hover) { .fixes button:hover { color: var(--navy); } .fixes button:hover::before { box-shadow: inset 0 0 0 1.5px var(--red); } }
+.tlink { display: inline-flex; align-items: center; gap: .5em; min-height: 48px; font-weight: 500; border-bottom: 1px solid currentColor; }
+.detail { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 48px; margin-top: clamp(30px, 3vw, 110px); padding-top: clamp(20px, 1.6vw, 60px); border-top: 2px solid var(--deep); }
+.detail h4 { margin: 0 0 .3em; font: 600 clamp(19px, 1.3vw, 46px)/1.2 var(--body); }
+.detail p { max-width: 38em; color: #33465C; }
+.detail .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 1.6em; }
+.detail .btn-line { color: var(--deep); }
+.price { margin-top: 1.2em; font-size: .9em; color: #4A5B70; max-width: 70em; }
+
+/* =====================================================================
+   03 THE CALL: the navy road runs between "call us" and "we call you"
+   ===================================================================== */
+.s03 { background: var(--red); padding: calc(var(--crest) + clamp(40px, 4vw, 150px)) var(--g) calc(var(--crest) + clamp(60px, 6vw, 220px)) var(--gl); }
+.s03 .opener { display: none; }
+.s03-grid { display: grid; grid-template-columns: minmax(0, 1fr) var(--lane) minmax(0, 1fr); align-items: start; }
+.s03 .lane { position: relative; align-self: stretch; }
+.s03 .mk { margin-bottom: clamp(20px, 2.4vw, 80px); }
+.s03 .mk-n { color: #fff; }
+.s03 .mk-t { color: #fff; }
+.s03 h2 { font: 600 clamp(26px, 2.4vw, 92px)/1.1 var(--body); letter-spacing: -.02em; }
+.s03 .us > p { margin-top: .8em; max-width: 25em; color: #fff; }
+.callnum { display: block; width: max-content; max-width: 100%; margin-top: clamp(26px, 2.6vw, 96px); font: 700 clamp(60px, 6.6vw, 280px)/.86 var(--disp); letter-spacing: -.01em; white-space: nowrap; }
+.callnum .g { display: block; width: max-content; transition: transform .7s var(--ease) .15s; }
+.callnum .g2 { color: var(--deeper); }   /* 3.3:1 on red, large-text AA */
+.s03:not(.in) .callnum .g { transform: translateX(-.12em); }
+.s03 .us .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 1.6em; margin-top: clamp(30px, 2.8vw, 100px); }
+
+.cb { min-width: 0; color: #fff; padding-top: clamp(40px, 7vw, 280px); }
+.cb-h { font: 600 clamp(24px, 2vw, 76px)/1.15 var(--body); letter-spacing: -.015em; }
+.cb-h + p { margin-top: .7em; color: #fff; }
+.cbf { margin-top: clamp(20px, 1.8vw, 70px); display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(18px, 1.5vw, 56px); }
+.fld label { display: block; font: 600 clamp(12px, .8vw, 27px)/1 var(--body); letter-spacing: .16em; text-transform: uppercase; color: #fff; }
+.fld label small { font: 500 .85em/1 var(--body); letter-spacing: .02em; text-transform: none; margin-left: .4em; }
+.fld input, .fld select { display: block; width: 100%; height: clamp(52px, 3.6vw, 128px); margin-top: .35em; padding: 0 2px; border: 0; border-bottom: 2px solid #fff; border-radius: 0; background: transparent;
+  font: 500 clamp(18px, 1.2vw, 40px)/1 var(--body); color: #fff; outline: 0; -webkit-appearance: none; appearance: none; }
+.fld select { padding-right: 2em; cursor: pointer;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23fff' stroke-width='2.4'/%3E%3C/svg%3E") no-repeat right 6px center / .8em auto; }
+.fld select option { color: var(--deep); background: #fff; }
+.fld input:focus, .fld select:focus { border-bottom-width: 4px; }
+.fld input:focus-visible, .fld select:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.fld [aria-invalid="true"] { border-bottom: 4px solid var(--deep); }
+.err { display: none; margin-top: .5em; padding: .35em .9em; border-radius: 999px; background: var(--deep); color: #fff; font: 600 clamp(14px, .95vw, 32px)/1.35 var(--body); width: max-content; max-width: 100%; }
+.err.on { display: block; }
+.cb-go { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 1.4em; margin-top: 4px; }
+.cb-note { font-size: .92em; color: #fff; max-width: 22em; }
+.cb-alt { color: #fff; }
+.cb-alt a { font-weight: 600; border-bottom: 2px solid #fff; padding-bottom: 1px; white-space: nowrap; }
+
+/* =====================================================================
+   04 ON THE WAY (deep navy map; the road runs in the lane beside it)
+   ===================================================================== */
+.s04 { background: var(--deeper); padding: calc(var(--crest) + clamp(60px, 6vw, 220px)) var(--g) calc(var(--crest) + clamp(60px, 6vw, 220px)) var(--gl);
+  display: grid; grid-template-columns: minmax(0, 1fr) calc(var(--lane) * 1.4) minmax(0, 1.4fr); align-items: center; }
+.s04 > * { min-width: 0; }
+.s04 .lane { position: relative; align-self: stretch; }
+.s04 .mk { color: #fff; }
+.s04 h2.t { margin-top: .9em; font: 600 clamp(28px, 2.9vw, 112px)/1.08 var(--body); letter-spacing: -.02em; }
+.s04 .lede { margin-top: 1.2em; max-width: 30em; color: var(--w78); }
+.pc { margin-top: clamp(26px, 2.4vw, 90px); max-width: 30em; }
+.pc label { display: block; font: 600 clamp(13px, .9vw, 30px)/1 var(--body); letter-spacing: .22em; text-transform: uppercase; color: var(--w78); margin-bottom: .7em; }
+.pc .field { display: flex; align-items: stretch; border-bottom: 2px solid #fff; }
+.pc input { flex: 1; min-width: 0; height: clamp(56px, 3.8vw, 140px); border: 0; background: transparent; padding: 0; font: 500 clamp(22px, 1.6vw, 60px)/1 var(--body); color: #fff; text-transform: uppercase; outline: 0; }
+.pc input::placeholder { color: rgba(255,255,255,.55); text-transform: none; }
+.pc .field:focus-within { border-color: var(--red); }
+.pc button { min-height: 48px; padding: 0 4px 0 16px; font: 600 clamp(15px, 1vw, 34px)/1 var(--body); color: #fff; }
+.pc .res { margin-top: .9em; min-height: 3.4em; color: var(--w78); }
+.pc .res b { color: #fff; }
+.pc .res a { color: #fff; font-weight: 600; border-bottom: 2px solid var(--red); }
+.pc .res a.use { display: flex; align-items: center; gap: .5em; width: max-content; min-height: 48px; margin-top: .4em; border: 0; font-weight: 600; }
+.map svg { width: 100%; height: auto; overflow: visible; }
+.map .kent { fill: var(--navy); stroke: rgba(255,255,255,.32); stroke-width: 2; stroke-linejoin: round; }
+.map .town circle { fill: #fff; }
+.map .town text { font: 500 19px var(--body); fill: var(--w78); }
+.map .town.hit text { fill: #fff; }
+.map .town.hit circle { fill: var(--red); }
+.map .rt { fill: none; stroke: rgba(255,255,255,.16); stroke-width: 12; stroke-linecap: round; }
+.map .rt-c { fill: none; stroke: var(--red); stroke-width: 3; stroke-dasharray: 10 8; transition: opacity .3s; }
+.map .dover-l { font: 600 28px var(--body); fill: #fff; }
+.towns { display: none; }
+
+.end { position: relative; background: var(--deep); padding: calc(var(--crest) + 36px) var(--g) 48px var(--gl); font-size: .92em; color: var(--w60); }
+.end b { color: #fff; font-weight: 600; }
+.thumb { display: none; }
+
+/* =====================================================================
+   DESKTOP ONLY: rail + its gutter
+   ===================================================================== */
+@media (min-width: 1101px) { :root { --gl: calc(var(--g) + clamp(36px, 2.6vw, 90px)); } }
+@media (max-width: 1100px) {
+  .rail { display: none; }
+  .now { display: none; }
+  .hdr .tl span { display: none; }
+  .hero .copy { width: 56%; }
+  .run .col { width: 70%; }
+}
+
+/* =====================================================================
+   STACKED (phones and small tablets, up to 900px): a simpler curve per chapter
+   ===================================================================== */
+@media (max-width: 900px) {
+  :root { --rw: clamp(14px, 3.8vw, 26px); --crest: clamp(18px, 5vw, 40px); --wd: clamp(44px, 12vw, 72px); }
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  html { scroll-padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .hdr { gap: 12px; }
+  .hdr .tl, .hdr .btn { display: none; }
+  .chap-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 2px 0 12px; font: 500 13px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: #fff; }
+  .chap-btn b { font-weight: 600; color: #fff; background: var(--red); padding: 5px 9px; border-radius: 999px; }
+  .chap-btn svg { width: 12px; height: 12px; transition: rotate .2s; }
+  .chap-btn[aria-expanded="true"] svg { rotate: 180deg; }
+  .chap-list.open { display: grid; position: fixed; top: var(--hdr); left: 0; right: 0; z-index: 49; background: var(--deep); padding: 4px var(--g) 16px; box-shadow: 0 1px 0 var(--w14); }
+  .chap-list a, .chap-list span { display: flex; align-items: center; gap: 14px; min-height: 52px; border-bottom: 1px solid var(--w14); font: 500 18px/1 var(--body); }
+  .chap-list span { color: var(--w60); }
+  .chap-list a i, .chap-list span i { font-style: normal; color: var(--red); min-width: 26px; }
+  .chap-list span em { margin-left: auto; font: 500 12px/1 var(--body); letter-spacing: .04em; text-transform: none; font-style: normal; }
+
+  /* hero: art band with its own curve at the top, words and number in the lower half */
+  .hero { --art: clamp(150px, calc(100svh - 570px), 380px); height: auto; min-height: calc(100svh - 64px); padding-top: var(--hdr); display: flex; flex-direction: column; }
+  .hero .art { position: relative; inset: auto; height: var(--art); flex: none; }
+  .hero .ph img { object-position: 30% 50%; }
+  .hero .scrim { background: linear-gradient(180deg, rgba(15,37,64,.5) 0%, rgba(15,37,64,.2) 45%, rgba(15,37,64,.7) 85%, var(--deep) 100%); }
+  .hero .copy { position: relative; z-index: 2; left: auto; bottom: auto; width: auto; padding: 16px var(--g) 28px; margin-top: auto; }
+  .hero h1 .big { font-size: clamp(42px, 13vw, 84px); line-height: .9; }
+  .sign { font-size: clamp(15px, 4.4vw, 22px); }
+  .lock { font-size: clamp(34px, 10.4vw, 62px); gap: .24em; margin-top: 22px; }
+  .lock .tab { padding: 0 .26em; }
+  .lock .tab span { display: none; }
+  .lock .tab svg { width: .42em; height: .42em; }
+  .hero .alt { display: none; }
+
+  /* 02 */
+  .story { height: auto; display: flex; flex-direction: column; }
+  .story .stage { position: relative; height: clamp(260px, 62vw, 420px); }
+  .story .ph { clip-path: none !important; }
+  .story .ph::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(15,37,64,.2) 0%, rgba(15,37,64,.15) 50%, rgba(15,37,64,.85) 88%, var(--deep) 100%); }
+  .story .mk { top: calc(100% + 16px); bottom: auto; left: var(--g); }
+  .story .tell { position: relative; left: auto; bottom: auto; width: auto; padding: 70px var(--g) calc(var(--crest) + 52px); }
+  .story h3 { font-size: clamp(27px, 8vw, 44px); }
+  .run { padding: calc(var(--crest) + 46px) var(--g) calc(var(--crest) + 56px); }
+  .run .col { width: auto; }
+  .run-head { flex-direction: column; gap: 8px; }
+  .fixes { grid-template-columns: minmax(0, 1fr); font-size: clamp(18px, 5.2vw, 24px); }
+  .detail { flex-direction: column; align-items: stretch; }
+  .detail .acts .btn { flex: 1 1 auto; }
+  .roadsvg .tp { display: none; }
+
+  /* 03 */
+  .s03 { padding: 0 var(--g) calc(var(--crest) + 64px); }
+  .s03 .opener { display: block; position: relative; height: clamp(150px, 34vw, 240px); margin: 0 calc(-1 * var(--g)); }
+  .s03 .opener .mk { position: absolute; left: var(--g); bottom: 18px; margin: 0; }
+  .s03 .us > .mk { display: none; }
+  .s03-grid { display: block; }
+  .s03 .lane { display: none; }
+  .callnum { font-size: clamp(58px, 18vw, 120px); line-height: .88; margin-top: 24px; }
+  .s03:not(.in) .callnum .g { transform: translateX(-.08em); }
+  .s03 .us .acts { flex-direction: column; align-items: stretch; margin-top: 30px; max-width: 560px; }
+  .s03 .us .acts .tlink { align-self: flex-start; }
+  .cb { padding-top: 48px; margin-top: 56px; border-top: 2px solid #fff; }
+  .cbf { max-width: 560px; }
+  .cb-h { font-size: clamp(25px, 7.4vw, 40px); }
+  .cb-go { flex-direction: column; align-items: stretch; }
+
+  /* 04 */
+  .s04 { display: block; padding: calc(var(--crest) + 52px) var(--g) calc(var(--crest) + 52px); }
+  .s04 .lane { display: none; }
+  .s04 h2.t { font-size: clamp(28px, 8.4vw, 46px); }
+  .map { margin-top: 32px; }
+  .map .town text { display: none; }
+  .map .town.hit text { display: block; font-size: 38px; }
+  .map .dover-l { font-size: 40px; }
+  .towns { display: block; margin-top: 20px; font: 400 16px/1.7 var(--body); color: var(--w78); }
+  .towns b { color: #fff; }
+  .towns .chev { width: 7px; height: 12px; margin: 0 6px 0 5px; }
+
+  .thumb { display: grid; grid-template-columns: 2fr 1fr; position: fixed; inset: auto 0 0; z-index: 60; padding-bottom: env(safe-area-inset-bottom); background: var(--deep); box-shadow: 0 -1px 0 var(--w14); }
+  .thumb a { height: 64px; display: flex; align-items: center; justify-content: center; gap: 9px; font: 600 17px/1 var(--body); color: #fff; white-space: nowrap; }
+  .thumb a:first-child { background: var(--red); border-radius: 0 999px 999px 0; }
+  .thumb .ic { width: 20px; height: 20px; }
+}
+@media (max-width: 370px) { .thumb a { font-size: 16px; gap: 6px; } }
+@media (max-width: 340px) { .thumb a:first-child span { display: none; } }
+@media (max-width: 900px) and (max-height: 700px) { .hero .sub { display: none; } .hero .mk { margin-bottom: 12px; } }
+
+/* =====================================================================
+   REDUCED MOTION: drawn, still road; the wheel parked; nothing waits
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .hero h1 .ln > span, .hero .copy .fade, .hero .ph img, .story .ph img, .s03 .callnum .g { transform: none !important; opacity: 1 !important; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" class="sr" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.27-.2-.57-.35m-5.42 7.4h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88a9.8 9.8 0 0 1 6.99 2.9 9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45h.01c6.55 0 11.89-5.34 11.89-11.89a11.82 11.82 0 0 0-3.48-8.41z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 12 12"><path d="M1 3.5 6 8.5l5-5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 10 18"><path d="M2 2 Q 11 9 2 16" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="hdr" id="hdr">
+  <a class="brand" href="#top" aria-label="Road Max, back to the start"><img data-rm-logo="v5" class="rm-logo" src="files/assets/images/roadmax/roadmax-logo-compact-white.svg" alt="Road Max" width="175" height="38"></a>
+  <p class="now" aria-live="polite"><b id="now-n">01</b><svg aria-hidden="true"><use href="#i-chev"/></svg><span id="now-t">Stopped</span></p>
+  <span class="sp"></span>
+  <button class="chap-btn" id="chap-btn" type="button" aria-expanded="false" aria-controls="chap-list"><b id="chap-n">01</b><span>Chapters</span><svg aria-hidden="true"><use href="#i-down"/></svg></button>
+  <a class="tl" href="#callback">Callback</a>
+  <a class="tl" href="https://wa.me/447842290576"><svg class="ic ic-wa" aria-hidden="true"><use href="#i-wa"/></svg><span>WhatsApp</span></a>
+  <a class="btn btn-red" href="tel:01304350200"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>01304 350200</a>
+</header>
+<nav class="chap-list" id="chap-list" aria-label="Chapters">
+  <a href="#top"><i>01</i>Stopped</a><a href="#what-happened"><i>02</i>What happened?</a><a href="#the-call"><i>03</i>The call</a><a href="#callback"><i>03</i>Callback</a><a href="#on-the-way"><i>04</i>On the way</a>
+  <span><i>05</i>On site<em>full build</em></span><span><i>06</i>Back on the road<em>full build</em></span>
+</nav>
+
+<nav class="rail" id="rail" aria-label="Journey">
+  <span class="fill"></span>
+  <a href="#top" style="top:0%" class="on" aria-label="01 Stopped">01</a>
+  <a href="#what-happened" style="top:20%" aria-label="02 What happened?">02</a>
+  <a href="#the-call" style="top:40%" aria-label="03 The call">03</a>
+  <a href="#on-the-way" style="top:60%" aria-label="04 On the way">04</a>
+  <span class="off" style="top:80%" title="On site (full build)">05</span>
+  <span class="off" style="top:100%" title="Back on the road (full build)">06</span>
+</nav>
+
+<main id="main">
+<svg class="roadsvg" id="roadsvg" aria-hidden="true" focusable="false"><defs id="rdefs"></defs><g id="g-crest"></g><g id="g-road"></g><g id="g-last"></g></svg>
+<img class="rollwheel" id="rollwheel" src="files/assets/images/v5-concept/wheel-cutout.webp" alt="" width="900" height="900" aria-hidden="true">
+<i class="probe rw" id="probe-rw"></i><i class="probe wd" id="probe-wd"></i><i class="probe cr" id="probe-cr"></i>
+
+<!-- 01 STOPPED -->
+<section class="hero" id="top" data-ch="01" data-t="Stopped" aria-labelledby="h1">
+  <div class="art">
+    <div class="ph"><img src="files/V5/assets/img/hero-night-2000.webp" srcset="files/V5/assets/img/hero-night-1000.webp 1000w, files/V5/assets/img/hero-night-2000.webp 2000w" sizes="100vw" alt="" width="2000" height="1333" fetchpriority="high"></div>
+    <div class="scrim"></div>
+    <!-- phone curve (inside the art band) -->
+    <i class="rp m" data-seg="hero" style="--x:84%;--y:-8%"></i><i class="rp m" data-seg="hero" style="--x:50%;--y:40%"></i><i class="rp m" data-seg="hero" style="--x:62%;--y:72%"></i><i class="rp m" data-seg="hero" style="--x:112%;--y:88%"></i>
+  </div>
+  <!-- desktop road: enters top right, long S-curve beside the headline -->
+  <i class="rp d" style="--x:80%;--y:-2%"></i>
+  <i class="rp d" style="--x:66%;--y:30%"></i>
+  <i class="rp d" data-rest="1" data-ws="1.7" style="--x:82%;--y:62%"></i>
+  <i class="rp d" style="--x:70%;--y:100%"></i>
+  <div class="copy lift">
+    <div class="mk fade"><span class="mk-n">01</span><span class="mk-t">Stopped</span></div>
+    <h1 id="h1"><span class="ln"><span class="big">Flat tyre?</span></span><span class="ln"><span class="big">Puncture?</span></span><span class="ln"><span><span class="sign">We come to you.</span></span></span></h1>
+    <p class="sub fade">Mobile tyre fitting, repairs and roadside help at home, at work or at the roadside. Day or night, 365 days a year, across Dover &amp; Kent.</p>
+    <a class="lock" href="tel:01304350200" aria-label="Call Road Max 24/7 on 01304 350200"><span class="tab"><svg aria-hidden="true"><use href="#i-phone"/></svg><span>Call 24/7</span></span><span class="num"><span class="a">01304</span> <span class="b">350200</span></span></a>
+    <a class="alt fade" href="https://wa.me/447842290576"><svg class="ic ic-wa" aria-hidden="true"><use href="#i-wa"/></svg>Or WhatsApp <b>07842 290576</b></a>
+  </div>
+</section>
+
+<!-- 02 WHAT HAPPENED? -->
+<section class="s02" id="what-happened" data-ch="02" data-t="What happened?" aria-labelledby="h2-02">
+  <div class="story" id="story" data-crest="1">
+    <div class="stage">
+      <div class="ph" id="story-ph"><img src="files/assets/images/v5-concept/svc-emergency.webp" alt="A car stopped on a dark road at night" width="1244" height="1400" loading="lazy"></div>
+      <i class="rp m" data-seg="story" style="--x:-14%;--y:26%"></i><i class="rp m" data-seg="story" style="--x:44%;--y:50%"></i><i class="rp m" data-seg="story" style="--x:84%;--y:100%"></i>
+      <div class="mk lift"><span class="mk-n">02</span><h2 class="mk-t" id="h2-02">What happened?</h2></div>
+    </div>
+    <i class="rp d" data-rest="1" data-ws="1.1" style="--x:60%;--y:34%"></i>
+    <i class="rp d" style="--x:56%;--y:78%"></i>
+    <div class="tell lift">
+      <p class="live"><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>On call 24/7</p>
+      <h3>Emergency<br>tyre fitting</h3>
+      <p>A blowout, a flat or a puncture, day or night: urgent tyre replacement wherever you've stopped, at home, at work or at the roadside.</p>
+      <a class="btn btn-red" href="tel:01304350200"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>Call 01304 350200</a>
+    </div>
+  </div>
+
+  <div class="run" id="run" data-crest="1">
+    <!-- the road sweeps right across the top (the display line rides on it), runs down the right, then swings back -->
+    <i class="rp d" data-tp="a" style="--x:60%;--y:calc(var(--crest) * .5)"></i>
+    <i class="rp d" style="--x:76%;--y:calc(var(--crest) + 6vw)"></i>
+    <i class="rp d" data-tp="b" style="--x:89%;--y:calc(var(--crest) + 15vw)"></i>
+    <i class="rp d" data-rest="1" data-ws="1" style="--x:88%;--y:56%"></i>
+    <i class="rp d" style="--x:84%;--y:calc(100% - 13vw)"></i>
+    <i class="rp d" style="--x:58%;--y:calc(100% - 3vw)"></i>
+    <div class="col lift">
+      <div class="run-head"><p>Seven more fixes · one number</p></div>
+      <h3>Whatever stopped you, one call brings the fix to you.</h3>
+      <p class="hint sr">Choose a fix to see what we do.</p>
+      <ul class="fixes" id="fixes">
+        <li><button type="button" aria-pressed="true" data-d="New premium, mid-range or budget tyres for cars, vans and 4x4s, fitted at home, at work or at the roadside.">Mobile tyre fitting</button></li>
+        <li><button type="button" aria-pressed="false" data-d="Punctures repaired on the spot. If the tyre can't be repaired, it's replaced where you are.">Puncture repair</button></li>
+        <li><button type="button" aria-pressed="false" data-d="Part-worn tyres checked to BS AU 159, supplied and fitted where you are.">Part-worn tyres</button></li>
+        <li><button type="button" aria-pressed="false" data-d="Flat battery? We get you started at home, at work or at the roadside.">Jump starts</button></li>
+        <li><button type="button" aria-pressed="false" data-d="A new battery fitted on site, wherever the old one gave up.">Battery replacement</button></li>
+        <li><button type="button" aria-pressed="false" data-d="Stuck or locking wheel nuts removed on site, so the wheel can come off.">Wheel nut removal</button></li>
+        <li><button type="button" aria-pressed="false" data-d="Breakdown recovery and roadside help across Dover &amp; Kent.">Breakdown recovery</button></li>
+      </ul>
+      <div class="detail" id="detail" aria-live="polite">
+        <div><h4 id="d-h">Mobile tyre fitting</h4><p id="d-p">New premium, mid-range or budget tyres for cars, vans and 4x4s, fitted at home, at work or at the roadside.</p></div>
+        <div class="acts"><a class="btn btn-red" href="tel:01304350200"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>Call 01304 350200</a><a class="tlink" id="d-wa" href="https://wa.me/447842290576"><svg class="ic ic-wa" aria-hidden="true"><use href="#i-wa"/></svg>or WhatsApp</a></div>
+      </div>
+      <p class="price">Tyres from Michelin, Bridgestone, Continental, Goodyear, Pirelli and Dunlop. The quoted price includes fitting, a new valve, wheel balancing and old-tyre disposal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 THE CALL -->
+<section class="s03" id="the-call" data-ch="03" data-t="The call" data-crest="1" data-road="navy" aria-labelledby="h2-03">
+  <div class="opener">
+    <i class="rp m" data-seg="call" data-col="navy" style="--x:90%;--y:0%"></i><i class="rp m" data-seg="call" data-col="navy" style="--x:68%;--y:48%"></i><i class="rp m" data-seg="call" data-col="navy" style="--x:112%;--y:74%"></i>
+    <div class="mk lift"><span class="mk-n">03</span><span class="mk-t">The call</span></div>
+  </div>
+  <div class="s03-grid">
+    <div class="us lift" id="us">
+      <div class="mk"><span class="mk-n">03</span><span class="mk-t">The call</span></div>
+      <h2 id="h2-03">One number. Day or night.</h2>
+      <p>Answered day or night, 365 days a year. Your registration or tyre size and where you are: that's all we need.</p>
+      <a class="callnum" id="callnum" href="tel:01304350200" aria-label="Call 01304 350200"><span class="g g1">01304</span><span class="g g2">350200</span></a>
+      <div class="acts"><a class="btn btn-deep" href="tel:01304350200"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg>Call now</a><a class="tlink" href="https://wa.me/447842290576?text=Hi%20Road%20Max%2C%20I%20need%20help.%20My%20location%20is%3A"><svg class="ic ic-wa" aria-hidden="true"><use href="#i-wa"/></svg>or WhatsApp your location</a></div>
+    </div>
+    <div class="lane" aria-hidden="true">
+      <i class="rp d" style="--x:58%;--y:22%"></i>
+      <i class="rp d" data-rest="1" data-ws="1" style="--x:42%;--y:58%"></i>
+      <i class="rp d" style="--x:54%;--y:calc(100% + var(--crest) + 2vw)"></i>
+    </div>
+    <div class="cb lift" id="callback" tabindex="-1" role="region" aria-labelledby="cb-h">
+      <h3 class="cb-h" id="cb-h">Can't talk?<br>We'll call you.</h3>
+      <p>Leave your number and we'll ring you back.</p>
+      <form class="cbf" id="cbf" novalidate>
+        <div class="fld"><label for="cb-name">Name</label><input id="cb-name" name="name" type="text" autocomplete="name" required aria-describedby="cb-name-e"><p class="err" id="cb-name-e">Please enter your name.</p></div>
+        <div class="fld"><label for="cb-phone">Phone</label><input id="cb-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="cb-phone-e"><p class="err" id="cb-phone-e">Please enter a phone number we can call (at least 10 digits).</p></div>
+        <div class="fld"><label for="cb-need">What's happened?</label><select id="cb-need" name="need" required aria-describedby="cb-need-e">
+          <option value="">Choose one</option><option>Emergency tyre fitting</option><option>Mobile tyre fitting</option><option>Mobile tyre repair (puncture)</option><option>Jump start</option><option>Breakdown recovery</option><option>Battery replacement</option><option>Wheel nut removal (incl. locking nuts)</option><option>Part-worn tyres</option><option>Something else</option></select><p class="err" id="cb-need-e">Please choose what's happened.</p></div>
+        <div class="fld"><label for="cb-where">Where are you? <small>optional</small></label><input id="cb-where" name="where" type="text" autocomplete="postal-code" aria-describedby="cb-where-h"><p class="sr" id="cb-where-h">Postcode, road or place.</p></div>
+        <div class="cb-go"><button class="btn btn-deep" type="submit"><svg class="ic ic-wa" aria-hidden="true"><use href="#i-wa"/></svg>Call me back</button><p class="cb-note">Sending opens WhatsApp with your details filled in.</p></div>
+        <p class="cb-alt">In a hurry? <a href="tel:01304350200">Call 01304 350200</a></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- 04 ON THE WAY -->
+<section class="s04" id="on-the-way" data-ch="04" data-t="On the way" data-crest="1" aria-labelledby="h2-04">
+  <div class="lift">
+    <div class="mk"><span class="mk-n">04</span><span class="mk-t">On the way</span></div>
+    <h2 class="t" id="h2-04">Dover,<br>to you.</h2>
+    <p class="lede">Founded in Dover in 2010. We cover Dover and towns right across Kent: at home, at work or at the roadside.</p>
+    <form class="pc" id="pc" novalidate>
+      <label for="pc-in">Where are you?</label>
+      <div class="field"><input id="pc-in" name="postcode" autocomplete="postal-code" placeholder="Postcode" maxlength="8" inputmode="text"><button type="submit">Check</button></div>
+      <p class="res" id="pc-res" aria-live="polite">Type your postcode and we'll draw the road from Dover to you.</p>
+    </form>
+  </div>
+  <div class="lane" aria-hidden="true">
+    <i class="rp d" data-rest="1" data-ws="1" style="--x:50%;--y:46%"></i>
+    <i class="rp d" style="--x:40%;--y:calc(100% + var(--crest) + 40px)"></i>
+  </div>
+  <div class="map lift">
+    <svg id="atlas" viewBox="20 20 900 600" role="img" aria-label="Map of Kent. Road Max covers Dover and all of Kent.">
+      <path class="kent" d="M373.3,41.6 L388.2,45.7 L415.4,43.2 L433.9,61.0 L422.3,48.5 L440.0,48.1 L452.3,60.6 L454.1,75.5 L446.1,84.9 L426.3,86.5 L422.7,72.1 L414.8,72.7 L400.8,73.8 L390.5,82.3 L382.1,98.8 L389.5,91.1 L393.4,95.3 L385.5,101.8 L339.3,105.7 L330.9,125.5 L340.9,108.8 L355.1,123.8 L370.2,129.7 L375.6,131.9 L380.2,127.9 L376.9,131.6 L386.2,139.4 L391.2,129.4 L398.7,129.4 L394.8,139.4 L393.1,148.7 L400.2,151.5 L379.8,183.7 L356.6,178.4 L344.8,188.9 L333.6,182.3 L321.6,174.3 L319.8,162.8 L291.4,149.2 L289.7,176.5 L268.4,169.4 L257.1,172.8 L257.9,164.5 L276.1,130.4 L289.6,127.2 L288.7,120.4 L298.3,120.4 L302.9,106.2 L311.5,103.9 L310.7,76.7 L292.2,62.1 L290.2,57.1 L298.4,56.2 L292.5,53.6 L298.8,38.4 L346.1,34.0 L373.3,41.6Z M562.4,102.4 L592.1,145.9 L559.6,163.1 L544.3,153.1 L535.8,147.6 L535.2,152.9 L525.4,146.4 L531.9,153.0 L524.7,154.1 L504.5,145.7 L480.1,148.0 L478.9,130.2 L459.7,118.5 L453.0,104.7 L459.4,110.0 L464.8,105.7 L461.4,95.1 L469.9,74.0 L489.0,78.6 L495.4,80.5 L515.3,93.8 L546.4,99.5 L562.4,102.4Z M148.2,42.1 L180.7,66.6 L197.3,59.2 L205.5,55.6 L205.6,55.6 L211.6,69.9 L246.1,76.4 L281.6,72.6 L293.2,64.8 L292.2,62.1 L310.7,76.7 L311.5,103.9 L302.9,106.2 L298.3,120.4 L288.7,120.4 L289.6,127.2 L276.1,130.4 L257.9,164.5 L257.1,172.8 L268.4,169.4 L289.7,176.5 L291.4,149.2 L319.8,162.8 L321.6,174.3 L333.6,182.3 L344.8,188.9 L356.6,178.4 L379.8,183.7 L400.2,151.5 L393.1,148.7 L394.8,139.4 L398.7,129.4 L399.9,129.4 L395.3,143.3 L408.1,121.2 L421.6,144.8 L431.9,126.9 L441.6,126.1 L436.9,138.4 L448.5,134.2 L437.7,99.3 L456.8,95.8 L458.8,100.3 L449.7,106.0 L455.8,119.6 L478.6,136.3 L479.0,154.9 L460.8,171.6 L480.5,155.4 L508.9,159.2 L510.6,171.1 L511.2,161.2 L541.0,161.7 L543.9,163.5 L559.9,173.1 L549.5,188.2 L558.3,180.7 L570.9,187.5 L559.6,175.7 L592.3,171.7 L592.3,171.7 L625.7,168.2 L642.7,152.3 L719.7,143.4 L759.0,138.9 L759.4,138.9 L814.3,137.9 L856.1,126.5 L861.4,125.4 L881.2,124.8 L891.6,131.3 L894.0,159.2 L894.0,159.2 L894.0,159.3 L881.1,190.8 L880.2,185.5 L874.9,189.3 L880.4,192.4 L852.5,187.6 L840.8,204.4 L840.4,204.9 L848.6,202.5 L854.4,225.5 L862.8,259.0 L869.0,290.2 L869.3,337.9 L863.2,355.7 L851.9,370.9 L831.3,380.5 L831.3,381.2 L831.2,381.2 L831.5,389.5 L828.6,383.9 L815.2,388.2 L819.2,396.9 L811.3,394.3 L815.9,396.5 L813.5,396.2 L822.1,399.6 L815.7,398.8 L806.6,397.6 L805.3,398.3 L804.6,398.7 L760.3,412.1 L757.1,412.5 L756.4,413.1 L753.4,415.6 L747.8,419.3 L747.8,420.3 L735.4,430.6 L741.1,434.0 L668.6,446.5 L665.1,449.2 L659.3,450.4 L620.5,484.0 L616.3,495.4 L613.9,498.9 L611.6,508.6 L600.8,538.3 L604.8,564.7 L609.1,593.1 L609.0,593.3 L534.2,581.9 L534.1,581.9 L542.0,572.8 L534.8,553.5 L525.9,549.2 L508.6,564.3 L491.1,530.1 L486.8,531.8 L487.9,518.1 L464.5,507.3 L443.9,514.1 L425.8,504.7 L416.3,490.6 L382.2,496.2 L359.6,504.2 L343.5,497.2 L340.9,486.8 L301.1,478.3 L295.6,454.6 L268.2,447.0 L255.0,427.1 L241.2,421.9 L227.2,426.1 L232.1,406.3 L217.4,405.2 L211.6,388.3 L180.3,391.1 L181.4,398.6 L162.5,396.2 L151.3,386.8 L118.1,395.6 L105.6,387.4 L111.4,374.3 L94.6,364.6 L44.0,369.1 L45.6,332.2 L34.0,299.4 L49.0,266.9 L39.4,223.2 L65.7,222.8 L65.3,200.5 L85.3,187.2 L85.7,173.1 L96.9,173.1 L106.1,148.3 L103.5,125.8 L112.4,126.1 L104.2,110.6 L106.7,110.3 L108.5,88.7 L113.6,91.0 L118.8,76.7 L137.4,65.9 L148.2,42.1Z"/>
+      <g id="towns"></g>
+      <path class="rt" id="rt" d=""/><path class="rt-c" id="rt-c" d=""/>
+      <circle cx="813.3" cy="383.5" r="13" fill="#D81800"/><circle cx="813.3" cy="383.5" r="5" fill="#fff"/>
+      <text class="dover-l" x="782" y="438">DOVER</text>
+    </svg>
+    <p class="towns" id="town-run"></p>
+  </div>
+</section>
+
+<footer class="end" data-crest="last"><b>Prototype ends here.</b> In the full build the road continues into 05 On site (the wheel turns a quarter per step) and 06 Back on the road (reviews), then the footer.</footer>
+</main>
+
+<div class="thumb" aria-label="Get help now"><a href="tel:01304350200"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><span>Call</span>&nbsp;01304 350200</a><a href="https://wa.me/447842290576"><svg class="ic ic-wa" aria-hidden="true"><use href="#i-wa"/></svg>WhatsApp</a></div>
+
+<script src="files/assets/js/roadmax-logo.js" defer></script>
+<script defer>
+(function () {
+  'use strict';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stacked = matchMedia('(max-width: 900px)');
+  var de = document.documentElement, NS = 'http://www.w3.org/2000/svg';
+
+  requestAnimationFrame(function () { document.body.classList.add('go'); });
+
+  /* ---------- header: current chapter, chapters menu, rail ---------- */
+  var rail = document.getElementById('rail'), railLinks = rail.querySelectorAll('a');
+  var nowN = document.getElementById('now-n'), nowT = document.getElementById('now-t'), chapN = document.getElementById('chap-n');
+  var chIO = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var n = e.target.getAttribute('data-ch');
+      nowN.textContent = n; chapN.textContent = n; nowT.textContent = e.target.getAttribute('data-t');
+      railLinks.forEach(function (a) { a.classList.toggle('on', a.textContent === n); });
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('[data-ch]').forEach(function (c) { chIO.observe(c); });
+  var cbtn = document.getElementById('chap-btn'), clist = document.getElementById('chap-list');
+  cbtn.addEventListener('click', function () { var o = !clist.classList.contains('open'); clist.classList.toggle('open', o); cbtn.setAttribute('aria-expanded', String(o)); });
+  clist.addEventListener('click', function (e) { if (e.target.closest('a')) { clist.classList.remove('open'); cbtn.setAttribute('aria-expanded', 'false'); } });
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .2 });
+  document.querySelectorAll('#story, .s03').forEach(function (el) { io.observe(el); });
+
+  /* =====================================================================
+     THE ROAD: lane markers -> Catmull-Rom -> cubic bezier. One path on desktop, one short
+     curve per chapter when stacked. Crests between chapters. The wheel rolls along it.
+     ===================================================================== */
+  var main = document.getElementById('main'), svg = document.getElementById('roadsvg');
+  var gCrest = document.getElementById('g-crest'), gRoad = document.getElementById('g-road'), gLast = document.getElementById('g-last'), defs = document.getElementById('rdefs');
+  var wheel = document.getElementById('rollwheel');
+  var R = null, drawn = false;
+
+  function mk(tag, attrs, parent) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+  function clear(g) { while (g.firstChild) g.removeChild(g.firstChild); }
+  function curve(p) {
+    var d = 'M' + p[0][0].toFixed(1) + ',' + p[0][1].toFixed(1);
+    for (var i = 0; i < p.length - 1; i++) {
+      var a = p[i - 1] || p[i], b = p[i], c = p[i + 1], e = p[i + 2] || c;
+      d += ' C' + (b[0] + (c[0] - a[0]) / 6).toFixed(1) + ',' + (b[1] + (c[1] - a[1]) / 6).toFixed(1) + ' ' +
+        (c[0] - (e[0] - b[0]) / 6).toFixed(1) + ',' + (c[1] - (e[1] - b[1]) / 6).toFixed(1) + ' ' + c[0].toFixed(1) + ',' + c[1].toFixed(1);
+    }
+    return d;
+  }
+  function sample(path, step) {
+    var L = path.getTotalLength(), out = [];
+    for (var s = 0; s <= L; s += step) { var q = path.getPointAtLength(s); out.push([q.x, q.y, s]); }
+    var e = path.getPointAtLength(L); out.push([e.x, e.y, L]);
+    return { L: L, pts: out, step: step };
+  }
+  function at(S, len) {
+    var i = Math.max(0, Math.min(S.pts.length - 2, Math.floor(len / S.step))), a = S.pts[i], b = S.pts[i + 1], t = (len - a[2]) / ((b[2] - a[2]) || 1);
+    return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, Math.atan2(b[1] - a[1], b[0] - a[0])];
+  }
+  function nearest(S, x, y) { var best = 0, bd = 1e12; S.pts.forEach(function (p) { var d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y); if (d < bd) { bd = d; best = p[2]; } }); return best; }
+
+  function build() {
+    var W = main.clientWidth, H = main.offsetHeight, mr = main.getBoundingClientRect();
+    var rw = document.getElementById('probe-rw').offsetWidth, ch = document.getElementById('probe-cr').offsetWidth;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.style.height = H + 'px';
+    [gCrest, gRoad, gLast, defs].forEach(clear);
+    function pos(el) { var r = el.getBoundingClientRect(); return [r.left - mr.left, r.top - mr.top]; }
+    var desk = !stacked.matches;
+
+    // crests: each chapter rises over a hill into view
+    var crests = {};
+    document.querySelectorAll('[data-crest]').forEach(function (sec) {
+      var y = pos(sec)[1], bg = getComputedStyle(sec).backgroundColor;
+      var d = 'M0,' + (y + 1) + ' Q' + (W / 2) + ',' + (y - 2 * ch) + ' ' + W + ',' + (y + 1) + ' Z';
+      crests[sec.className.split(' ')[0]] = y;
+      mk('path', { d: d, fill: bg }, sec.getAttribute('data-crest') === 'last' ? gLast : gCrest);
+    });
+
+    // segments
+    var groups = [];
+    if (desk) {
+      groups.push({ pts: Array.prototype.slice.call(document.querySelectorAll('.rp.d')), col: 'red', main: true });
+    } else {
+      var by = {};
+      document.querySelectorAll('.rp.m').forEach(function (m) { var k = m.getAttribute('data-seg'); (by[k] = by[k] || { pts: [], col: m.getAttribute('data-col') || 'red', seg: k }).pts.push(m); });
+      Object.keys(by).forEach(function (k) { groups.push(by[k]); });
+    }
+    var clw = Math.max(1.2, rw * .06), dashLen = Math.max(8, rw * .5), lw = Math.max(1, rw * .045);
+    var wd = document.getElementById('probe-wd').offsetWidth;
+    R = { rw: rw, wd: wd, desk: desk, segs: [], centre: [] };
+    if (!drawn && !reduce) { gRoad.style.opacity = 0; }
+    // light ink on dark and red ground; a navy copy is clipped to the light-grey run
+    var runEl = document.getElementById('run'), yR0 = pos(runEl)[1], yR1 = yR0 + runEl.offsetHeight;
+    var cpr = mk('clipPath', { id: 'cliprun' }, defs);
+    mk('path', { d: 'M0,' + yR0 + ' Q' + W / 2 + ',' + (yR0 - 2 * ch) + ' ' + W + ',' + yR0 + ' L' + W + ',' + yR1 + ' Q' + W / 2 + ',' + (yR1 - 2 * ch) + ' 0,' + yR1 + ' Z' }, cpr);
+    function edges(S, off) {
+      var l = [], r = [];
+      for (var i = 0; i < S.pts.length; i++) {
+        var p = S.pts[i], q = S.pts[Math.max(0, i - 1)], n = S.pts[Math.min(S.pts.length - 1, i + 1)];
+        var tx = n[0] - q[0], ty = n[1] - q[1], len = Math.hypot(tx, ty) || 1, nx = -ty / len, ny = tx / len;
+        l.push((p[0] + nx * off).toFixed(1) + ',' + (p[1] + ny * off).toFixed(1)); r.push((p[0] - nx * off).toFixed(1) + ',' + (p[1] - ny * off).toFixed(1));
+      }
+      return 'M' + l.join(' L') + ' M' + r.join(' L');
+    }
+    groups.forEach(function (gp) {
+      var P = gp.pts.map(function (m) { var p = pos(m); return [p[0], p[1], m]; });
+      var d = curve(P);
+      var band = mk('path', { d: d, class: 'rd', stroke: 'rgba(255,255,255,.07)', 'stroke-width': rw }, gRoad);   // the tarmac, barely there
+      var S = sample(band, desk ? 6 : 3);
+      var ed = edges(S, rw / 2);
+      var g1 = mk('g', {}, gRoad);
+      mk('path', { d: ed, class: 'ed', stroke: 'rgba(255,255,255,.3)', 'stroke-width': lw, fill: 'none' }, g1);
+      var cl = mk('path', { d: d, class: 'cl', stroke: 'rgba(255,255,255,.6)', 'stroke-width': clw, 'stroke-dasharray': dashLen + ' ' + dashLen * 1.4 }, g1);
+      R.centre.push(cl);
+      if (gp.main) {
+        var g2 = mk('g', { 'clip-path': 'url(#cliprun)' }, gRoad);
+        mk('path', { d: d, class: 'rd', stroke: 'rgba(15,37,64,.05)', 'stroke-width': rw }, g2);
+        mk('path', { d: ed, class: 'ed', stroke: 'rgba(15,37,64,.28)', 'stroke-width': lw, fill: 'none' }, g2);
+        R.centre.push(mk('path', { d: d, class: 'cl', stroke: 'rgba(15,37,64,.5)', 'stroke-width': clw, 'stroke-dasharray': dashLen + ' ' + dashLen * 1.4 }, g2));
+      }
+      R.segs.push({ S: S, markers: P, seg: gp.seg });
+    });
+
+    // desktop extras: wheel rests, the photo crop along the road, the display line riding the curve
+    var M = R.segs[0];
+    if (desk) {
+      R.rests = M.markers.filter(function (p) { return p[2].hasAttribute('data-rest'); }).map(function (p) {
+        return { L: nearest(M.S, p[0], p[1]), y: p[1], ws: parseFloat(p[2].getAttribute('data-ws')) };
+      });
+      cropStory(M.S, rw);
+      displayLine(M, rw, W);
+    } else {
+      document.getElementById('story-ph').style.clipPath = '';
+      R.rests = null;
+    }
+    if (!drawn && !reduce) requestAnimationFrame(function () { requestAnimationFrame(function () { gRoad.style.transition = 'opacity .9s ease'; gRoad.style.opacity = 1; }); });
+    drawn = true;
+    frame();
+  }
+
+  function cropStory(S, rw) {
+    var ph = document.getElementById('story-ph'), r = ph.getBoundingClientRect(), mr = main.getBoundingClientRect();
+    var top = r.top - mr.top, bot = top + r.height, left = r.left - mr.left, w = r.width, gap = rw * .5 + Math.max(10, rw * .12);
+    var edge = [];
+    for (var i = 1; i < S.pts.length; i++) {
+      var p = S.pts[i], q = S.pts[i - 1];
+      if (p[1] < top - 40 || p[1] > bot + 40) continue;
+      var tx = p[0] - q[0], ty = p[1] - q[1], l = Math.hypot(tx, ty) || 1, nx = -ty / l, ny = tx / l;
+      if (nx < 0) { nx = -nx; ny = -ny; }
+      edge.push([(p[0] + nx * gap - left).toFixed(1) + 'px', (p[1] + ny * gap - top).toFixed(1) + 'px']);
+    }
+    if (edge.length < 2) { ph.style.clipPath = ''; return; }
+    var poly = edge.map(function (e) { return e.join(' '); });
+    poly.push(w + 'px ' + edge[edge.length - 1][1], w + 'px ' + edge[0][1]);
+    ph.style.clipPath = 'polygon(' + poly.join(',') + ')';
+  }
+
+  function displayLine(M, rw, W) {
+    var a = null, b = null;
+    M.markers.forEach(function (p) { var t = p[2].getAttribute('data-tp'); if (t === 'a') a = nearest(M.S, p[0], p[1]); if (t === 'b') b = nearest(M.S, p[0], p[1]); });
+    if (a === null || b === null) return;
+    var off = rw * .5 + Math.max(10, rw * .6), pts = [];
+    for (var s = a; s <= b; s += 6) {
+      var p = at(M.S, s), nx = Math.sin(p[2]), ny = -Math.cos(p[2]);
+      if (ny > 0) { nx = -nx; ny = -ny; }                       // always the upper side
+      pts.push((p[0] + nx * off).toFixed(1) + ',' + (p[1] + ny * off).toFixed(1));
+    }
+    var line = mk('path', { id: 'tpline', d: 'M' + pts.join(' L'), fill: 'none' }, defs);
+    var t = mk('text', { class: 'tp' }, gRoad), tp = mk('textPath', { href: '#tpline', startOffset: '1%' }, t);
+    tp.textContent = 'Fitting · repairs · part-worn · jump starts · batteries · wheel nuts · recovery';
+    var L = line.getTotalLength(), fs = Math.max(14, Math.min(40, W * .0105));
+    t.style.fontSize = fs + 'px';
+    var tl = t.getComputedTextLength();
+    if (tl > L * .96) t.style.fontSize = (fs * L * .96 / tl).toFixed(1) + 'px';
+  }
+
+  /* ---------- scroll: dashes travel along the curve, the wheel rolls between chapter rests ---------- */
+  var ticking = false, logoRig = null, lastY = scrollY, lastT = performance.now();
+  function smooth(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+  function placeWheel(S, L, d) {
+    var p = at(S, L);
+    wheel.style.width = d.toFixed(1) + 'px';
+    var rot = reduce ? 0 : (L / (d / 2)) * 180 / Math.PI;
+    wheel.style.transform = 'translate(' + (p[0] - d / 2).toFixed(1) + 'px,' + (p[1] - d / 2).toFixed(1) + 'px) rotate(' + rot.toFixed(1) + 'deg)';
+    wheel.classList.add('on');
+  }
+  function frame() {
+    ticking = false;
+    var y = scrollY, max = de.scrollHeight - innerHeight;
+    rail.style.setProperty('--p', max > 0 ? Math.min(1, y / max).toFixed(3) : 0);
+    if (!R) return;
+    if (!reduce) R.centre.forEach(function (c) { c.style.strokeDashoffset = (-(y * (R.desk ? .6 : .25))).toFixed(1); });
+    if (R.desk && R.rests && R.rests.length) {
+      var rs = R.rests, S = R.segs[0].S, L = rs[0].L, ws = rs[0].ws;
+      if (!reduce) {
+        var F = y + innerHeight * .55 - (main.getBoundingClientRect().top + scrollY);
+        for (var i = 0; i < rs.length - 1; i++) {
+          if (F >= rs[i].y) { var q = smooth(.3, .85, (F - rs[i].y) / (rs[i + 1].y - rs[i].y)); L = rs[i].L + (rs[i + 1].L - rs[i].L) * q; ws = rs[i].ws + (rs[i + 1].ws - rs[i].ws) * q; }
+        }
+      }
+      placeWheel(S, L, R.wd * ws);
+    } else if (!R.desk) {
+      var hs = R.segs.filter(function (s) { return s.seg === 'hero'; })[0];
+      if (hs) placeWheel(hs.S, hs.S.L * (.42 + (reduce ? 0 : .22 * Math.min(1, y / 320))), R.wd * 1.15);
+    }
+    var t = performance.now();
+    if (logoRig && R.desk && !reduce) logoRig.drive((y - lastY) * .5, t - lastT);
+    lastY = y; lastT = t;
+  }
+  addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }, { passive: true });
+  var pend = 0;
+  function rebuild() { if (pend) return; pend = requestAnimationFrame(function () { pend = 0; build(); }); }
+  if ('ResizeObserver' in window) new ResizeObserver(rebuild).observe(main);
+  addEventListener('resize', rebuild);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(rebuild);
+  addEventListener('load', function () {
+    rebuild();
+    var logo = document.querySelector('.hdr svg.rm-logo');
+    if (!reduce && window.RoadMaxLogo && logo) logoRig = RoadMaxLogo.rig(logo);
+  });
+  build();
+
+  /* ---------- 02: the run ---------- */
+  var fixes = document.querySelectorAll('#fixes button');
+  var dH = document.getElementById('d-h'), dP = document.getElementById('d-p'), dW = document.getElementById('d-wa');
+  fixes.forEach(function (b) {
+    b.addEventListener('click', function () {
+      fixes.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      dH.textContent = b.textContent; dP.textContent = b.getAttribute('data-d');
+      dW.href = 'https://wa.me/447842290576?text=' + encodeURIComponent('Hi Road Max, I need help with: ' + b.textContent);
+    });
+  });
+
+  /* ---------- 03: callback form (no server: it opens WhatsApp with the details filled in) ---------- */
+  var cbf = document.getElementById('cbf'), cbWhere = document.getElementById('cb-where'), prefilled = '';
+  var fName = document.getElementById('cb-name'), fTel = document.getElementById('cb-phone'), fNeed = document.getElementById('cb-need');
+  function telOk(v) { var d = v.replace(/\D/g, ''); return d.length >= 10 && d.length <= 13 && !/[^\d\s()+-]/.test(v.trim()); }
+  function okFor(el) { return el === fTel ? telOk(el.value) : !!el.value.trim(); }
+  function mark(el, bad) {
+    el.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    document.getElementById(el.id + '-e').classList.toggle('on', bad);
+    return bad;
+  }
+  cbf.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var bad = [fName, fTel, fNeed].filter(function (el) { return mark(el, !okFor(el)); });
+    if (bad.length) { bad[0].focus(); return; }
+    var text = 'Hi Road Max, please call me back.\nName: ' + fName.value.trim() + '\nPhone: ' + fTel.value.trim() + '\nNeed: ' + fNeed.value;
+    if (cbWhere.value.trim()) text += '\nLocation: ' + cbWhere.value.trim();
+    // open synchronously (popup blockers allow it inside the submit); cut the opener by hand, because the
+    // 'noopener' feature makes window.open return null even on success. Null means blocked: use this tab.
+    var waUrl = 'https://wa.me/447842290576?text=' + encodeURIComponent(text);
+    var win = window.open(waUrl, '_blank');
+    if (win) win.opener = null; else location.href = waUrl;
+  });
+  [fName, fTel, fNeed].forEach(function (el) {
+    el.addEventListener(el === fNeed ? 'change' : 'input', function () { if (el.getAttribute('aria-invalid') === 'true' && okFor(el)) mark(el, false); });
+  });
+  function prefillWhere(v) { if (!cbWhere.value.trim() || cbWhere.value === prefilled) { cbWhere.value = v; prefilled = v; } }
+
+  /* ---------- 04: towns, postcode, a curved road from Dover ---------- */
+  var T = { Dover: [813.3, 383.5], Deal: [867, 291.4, 'e'], Folkestone: [725.7, 428.7, 'b'], Canterbury: [670.5, 235.3, 'w'], Margate: [857.6, 137, 'w'],
+    Ramsgate: [875.8, 181.3, 'w'], Ashford: [546.4, 365.4], Maidstone: [335.7, 243.3, 'n'], Medway: [347.8, 129.5], Dartford: [145.7, 74],
+    Sevenoaks: [129.2, 243.3], 'Tunbridge Wells': [173.7, 379.5], Whitstable: [638.1, 157, 'w'], 'Herne Bay': [700.4, 145, 'n'] };
+  var g = document.getElementById('towns');
+  Object.keys(T).forEach(function (n) {
+    if (n === 'Dover') return;
+    var p = T[n], k = mk('g', { class: 'town', 'data-town': n }, g);
+    mk('circle', { cx: p[0], cy: p[1], r: 5 }, k);
+    var side = p[2] || 'e', t = mk('text', {}, k);
+    t.textContent = n;
+    if (side === 'w') { t.setAttribute('x', p[0] - 12); t.setAttribute('y', p[1] + 7); t.setAttribute('text-anchor', 'end'); }
+    else if (side === 'n') { t.setAttribute('x', p[0]); t.setAttribute('y', p[1] - 14); t.setAttribute('text-anchor', 'middle'); }
+    else if (side === 'b') { t.setAttribute('x', p[0]); t.setAttribute('y', p[1] + 30); t.setAttribute('text-anchor', 'middle'); }
+    else { t.setAttribute('x', p[0] + 12); t.setAttribute('y', p[1] + 7); }
+  });
+  var tn = Object.keys(T);
+  document.getElementById('town-run').innerHTML = tn.map(function (n, k) { return '<span style="white-space:nowrap">' + (k ? n : '<b>' + n + '</b>') + (k < tn.length - 1 ? ' ·' : '') + '</span>'; }).join(' ');
+
+  function townFor(pc) {
+    var m = pc.replace(/\s+/g, '').toUpperCase().match(/^([A-Z]{1,2})(\d{1,2})/);
+    if (!m) return null;
+    var a = m[1], n = +m[2];
+    if (a === 'CT') {
+      if (n >= 15 && n <= 17) return 'Dover'; if (n === 13 || n === 14) return 'Deal';
+      if (n >= 7 && n <= 9) return 'Margate'; if (n >= 10 && n <= 12) return 'Ramsgate';
+      if (n === 5) return 'Whitstable'; if (n === 6) return 'Herne Bay'; if (n >= 18 && n <= 21) return 'Folkestone';
+      return 'Canterbury';
+    }
+    if (a === 'ME') { if (n >= 14 && n <= 18) return 'Maidstone'; if (n === 13) return 'Canterbury'; if (n <= 20) return 'Medway'; return null; }
+    if (a === 'TN') { if (n >= 23 && n <= 30) return 'Ashford'; if (n >= 13 && n <= 16) return 'Sevenoaks'; if ((n >= 1 && n <= 4) || (n >= 9 && n <= 12) || n === 17 || n === 18) return 'Tunbridge Wells'; return null; }
+    if (a === 'DA') { if ((n >= 1 && n <= 4) || (n >= 9 && n <= 13)) return 'Dartford'; return null; }
+    return null;
+  }
+  var rt = document.getElementById('rt'), rtc = document.getElementById('rt-c'), res = document.getElementById('pc-res'), inp = document.getElementById('pc-in');
+  function draw(name) {
+    var a = T.Dover, b = T[name];
+    g.querySelectorAll('.town').forEach(function (t) { t.classList.toggle('hit', t.getAttribute('data-town') === name); });
+    if (!b || name === 'Dover') { rt.setAttribute('d', ''); rtc.setAttribute('d', ''); return; }
+    // a country road: an S-bend between Dover and the town (two opposite bows)
+    var dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy), nx = -dy / len, ny = dx / len, k = .16 * len;
+    var c1 = [a[0] + dx * .33 + nx * k, a[1] + dy * .33 + ny * k], c2 = [a[0] + dx * .66 - nx * k, a[1] + dy * .66 - ny * k];
+    var d = 'M' + a[0] + ',' + a[1] + ' C' + c1[0].toFixed(1) + ',' + c1[1].toFixed(1) + ' ' + c2[0].toFixed(1) + ',' + c2[1].toFixed(1) + ' ' + b[0] + ',' + b[1];
+    rt.setAttribute('d', d); rtc.setAttribute('d', d);
+    var L = rt.getTotalLength();
+    rt.style.transition = 'none'; rt.style.strokeDasharray = L; rt.style.strokeDashoffset = reduce ? 0 : L; rtc.style.opacity = reduce ? 1 : 0;
+    rt.getBoundingClientRect();
+    if (!reduce) {
+      rt.style.transition = 'stroke-dashoffset ' + (stacked.matches ? .8 : 1.1) + 's cubic-bezier(.5,0,.2,1)'; rt.style.strokeDashoffset = 0;
+      setTimeout(function () { rtc.style.opacity = 1; }, stacked.matches ? 750 : 1050);
+    }
+  }
+  document.getElementById('pc').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = inp.value.trim().toUpperCase();
+    if (!v) { res.textContent = 'Type your postcode, for example CT16 or ME14.'; return; }
+    var t = townFor(v), msg = encodeURIComponent('Hi Road Max, I need help. My postcode is ' + v + '.');
+    if (t) {
+      draw(t);
+      res.innerHTML = '<b>' + v.replace(/</g, '') + ' · ' + t + ' area.</b> That\'s on our patch. <a href="tel:01304350200">Call 01304 350200</a> or <a href="https://wa.me/447842290576?text=' + msg + '">WhatsApp your location</a>. <a class="use" href="#callback" id="pc-use"><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>Use this in my callback</a>';
+      prefillWhere(v);
+      document.getElementById('pc-use').addEventListener('click', function (ev) {
+        ev.preventDefault(); cbWhere.value = v; prefilled = v;
+        var target = fName.value.trim() ? (fTel.value.trim() ? fNeed : fTel) : fName;
+        document.getElementById('callback').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        target.focus({ preventScroll: true });
+      });
+    } else { draw('Dover'); res.innerHTML = 'That postcode may be outside Kent. <a href="tel:01304350200">Call 01304 350200</a> and we\'ll tell you straight away.'; }
+  });
+  var mIO = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { draw('Canterbury'); mIO.disconnect(); } }, { threshold: .4 });
+  mIO.observe(document.getElementById('atlas'));
+})();
+</script>
+<script src="version-bar.js" defer></script>
+</body>
+</html>

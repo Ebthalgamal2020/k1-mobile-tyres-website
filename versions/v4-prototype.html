@@ -1,0 +1,1115 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Road Max · V4 Sidewall prototype</title>
+<meta name="description" content="Road Max: 24/7 mobile tyre fitting, repairs and roadside help across Dover &amp; Kent.">
+<link rel="icon" href="files/assets/images/roadmax/roadmax-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#D81800; --navy:#183860; --deep:#0F2540; --deeper:#0A1B30; --ink:#071426; --grey:#F5F5F5;
+  --w72:rgba(255,255,255,.72); --w60:rgba(255,255,255,.62); --rule:rgba(255,255,255,.16);
+  --g:clamp(16px,4vw,160px);
+  --dial:clamp(170px,12vw,440px);
+  --rail:calc(var(--dial) + var(--g) + 12px);
+  --arc:clamp(28px,5vw,220px);
+  --sp:clamp(104px,10vw,420px);
+  --body:clamp(17px,calc(12px + .33vw),20px);
+  --small:clamp(12px,calc(8px + .3vw),22px);
+  --h1:clamp(52px,7vw,270px);
+  --h2:clamp(28px,2.9vw,116px);
+  --h3:clamp(24px,1.9vw,76px);
+  --ch:clamp(22px,2vw,80px);
+  --ctah:clamp(64px,4.6vw,176px);
+  --bc:'Barlow Condensed','Arial Narrow',sans-serif; --in:'Inter',system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--deep);color:#fff;font:400 var(--body)/1.55 var(--in);overflow-x:clip}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.eyebrow{display:flex;align-items:center;gap:.9em;margin:0;font:600 var(--small)/1.4 var(--in);letter-spacing:.14em;text-transform:uppercase;color:var(--w72)}
+.eyebrow::before{content:"";width:2.2em;height:2px;background:var(--red);flex:none}
+.h2{margin:.55em 0 0;font:600 var(--h2)/1.12 var(--in);letter-spacing:-.02em}
+.sec-p{margin:1.1em 0 0;font-size:var(--body);color:var(--w72);max-width:46ch}
+
+/* every section after the hero rises over the previous one on a tread arc */
+.arced{position:relative;z-index:2}
+.arced::before{content:"";position:absolute;left:0;right:0;top:calc(var(--arc) * -1 + 1px);height:var(--arc);background:inherit;clip-path:ellipse(64% 100% at 50% 100%);pointer-events:none}
+.arced::after{content:"";position:absolute;left:18%;right:18%;top:calc(var(--arc) * -1 + 1px);height:var(--arc);border-top:2px dashed rgba(255,255,255,.14);border-radius:50% 50% 0 0/100% 100% 0 0;pointer-events:none}
+
+/* ---------- top ---------- */
+.top{position:absolute;top:0;left:0;right:0;z-index:50;height:clamp(72px,6vw,220px);display:flex;align-items:center;padding:0 var(--g)}
+.brand{display:flex;align-items:center;min-height:48px}
+.logo{height:clamp(26px,2.1vw,84px);width:auto}
+.callfix{position:fixed;top:clamp(16px,1.3vw,52px);right:clamp(16px,1.6vw,64px);z-index:60;display:inline-flex;align-items:center;gap:.5em;min-height:clamp(48px,3.4vw,128px);padding:0 1em 0 .4em;background:var(--red);color:#fff;text-decoration:none;border-radius:999px;font:700 clamp(20px,1.45vw,56px)/1 var(--bc);letter-spacing:.02em;box-shadow:0 8px 24px rgba(4,11,22,.35)}
+.callfix .ic{display:grid;place-items:center;width:1.7em;height:1.7em;border-radius:50%;background:#fff;color:var(--red)}
+.callfix svg{width:.85em;height:.85em}
+@media (hover:hover){.callfix:hover{background:#B81400}}
+
+/* ---------- controls: capsules and rings ---------- */
+.btn{display:inline-flex;align-items:center;gap:.7em;min-height:var(--ctah);padding:0 1.3em 0 .45em;text-decoration:none;border-radius:999px;font-size:clamp(16px,1.1vw,42px);text-align:left;transition:background-color .2s,border-color .2s}
+.btn .ic{display:grid;place-items:center;flex:none;width:calc(var(--ctah) - .9em);height:calc(var(--ctah) - .9em);border-radius:50%}
+.btn svg{width:1.4em;height:1.4em;flex:none}
+.btn span.tx{display:flex;flex-direction:column;line-height:1}
+.btn small{font:500 .75em/1.2 var(--in);letter-spacing:.04em;opacity:.9;margin-bottom:.25em}
+.btn b{font:700 1.65em/1 var(--bc);letter-spacing:.02em;white-space:nowrap}
+.btn.call{background:var(--red);color:#fff}
+.btn.call .ic{background:#fff;color:var(--red)}
+.btn.wa{border:1.5px solid rgba(255,255,255,.45);color:#fff}
+.btn.wa .ic{background:rgba(255,255,255,.08)}
+.wa-ico{color:#25D366}
+@media (hover:hover){.btn.call:hover{background:#B81400}.btn.wa:hover{border-color:#fff}}
+/* the round WhatsApp control in the hero */
+.ring-btn{position:relative;display:grid;place-items:center;align-content:center;gap:.25em;width:calc(var(--ctah) * 1.25);height:calc(var(--ctah) * 1.25);border-radius:50%;border:1.5px solid rgba(255,255,255,.5);color:#fff;text-decoration:none;font:700 clamp(15px,1.05vw,40px)/1 var(--bc);letter-spacing:.03em}
+.ring-btn svg{width:1.6em;height:1.6em}
+.ring-btn::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px dashed rgba(255,255,255,.22)}
+@media (hover:hover){.ring-btn:hover{border-color:#fff}}
+
+/* ---------- hero: the horizon tyre ---------- */
+.hero{position:relative;min-height:max(100vh,640px);min-height:max(100svh,640px);display:flex;flex-direction:column;overflow:clip;background:var(--deep)}
+.hero-copy{position:relative;z-index:4;padding:clamp(84px,6.6vw,250px) var(--g) 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.hero-copy .eyebrow::after{content:"";width:2.2em;height:2px;background:var(--red);flex:none}
+.slot{display:grid;margin:.9em 0 1.1em;width:100%;justify-items:center;font-size:var(--body)}
+.ans{grid-area:1/1;align-self:center;width:100%}
+.ans:not(.is-on){visibility:hidden}
+.ans.is-in{animation:ansIn .46s var(--ease) both}
+.ans.is-out{visibility:visible;animation:ansOut .22s ease-in both}
+@keyframes ansIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@keyframes ansOut{to{opacity:0;transform:translateY(-20px)}}
+.h1{margin:0;font:800 var(--h1)/.88 var(--bc);text-transform:uppercase}
+.lede{margin:.8em auto 0;max-width:54ch;color:var(--w72)}
+.a-k{margin:0 0 .6em;font:600 var(--small)/1.2 var(--in);letter-spacing:.14em;text-transform:uppercase}
+.a-k i{font-style:normal;color:var(--red);margin-right:.6em}
+.a-t{margin:0 auto;max-width:22ch;font:800 clamp(34px,4.2vw,170px)/.94 var(--bc);text-transform:uppercase}
+.a-b{margin:.7em auto 0;max-width:56ch;color:var(--w72)}
+.cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(12px,1vw,40px)}
+.horizon{position:relative;flex:1 1 auto;min-height:clamp(280px,24vw,900px)}
+.arcbox{position:absolute;inset:0}
+.tyre-ghost,.tyre{--D:160vw;position:absolute;width:var(--D);height:var(--D);left:calc(50% - var(--D) / 2);top:clamp(64px,5.4vw,220px)}
+.tyre-ghost{visibility:hidden;pointer-events:none}
+.tyre-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.tyre{border-radius:50%;box-shadow:0 -30px 120px rgba(3,10,22,.5)}
+.spin{position:absolute;inset:0;will-change:transform}
+.spin svg,.tyre .light{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.tyre .seg{fill:rgba(255,255,255,.4);transition:fill .35s}
+.tyre .seg.tech{fill:rgba(255,255,255,.5)}
+.tyre .seg.on,.tyre .idx.on{fill:var(--red)}
+.tyre .idx{fill:rgba(255,255,255,.75);opacity:0;transition:fill .35s,opacity .35s}
+.tyre.svc .idx{opacity:1}
+.choreo .tyre-layer{position:fixed;inset:0;z-index:3}
+.choreo .tyre{left:0;top:0;transform-origin:0 0;will-change:transform}
+.triage{position:absolute;inset:0;z-index:4;margin:0;padding:0;list-style:none}
+.triage li{position:absolute;left:0;top:0;white-space:nowrap}
+.t{position:relative;display:inline-flex;align-items:center;gap:.25em;min-height:max(56px,1.5em);padding:0 .12em;font:600 var(--ch)/1 var(--bc);color:var(--w72);letter-spacing:.02em;transition:color .2s}
+.t sup{font:600 .3em/1 var(--in);letter-spacing:.06em;color:var(--w60);transform:translateY(-.9em)}
+.t::before{content:"";position:absolute;left:.12em;right:.12em;bottom:.18em;height:max(3px,.08em);background:var(--red);transform:scaleX(0);transition:transform .35s var(--ease)}
+.t[aria-pressed="true"]{color:#fff}
+.t[aria-pressed="true"]::before{transform:scaleX(1)}
+.t[aria-pressed="true"] sup{color:#fff}
+@media (hover:hover){.t:hover{color:#fff}}
+
+/* ---------- radial section dial (desktop) ---------- */
+.dial-nav{position:fixed;left:clamp(12px,1vw,40px);bottom:clamp(12px,1vw,40px);z-index:55;width:var(--dial);height:var(--dial)}
+.dial-nav svg{width:100%;height:100%;overflow:visible;display:block}
+.dl-g{transform-box:view-box;transform-origin:100px 100px}
+.dl text{font:700 15px var(--bc);letter-spacing:.6px;fill:rgba(255,255,255,.72);transition:fill .3s}
+.dl .hit{fill:none;stroke:transparent;stroke-width:30;pointer-events:stroke}
+.dl[aria-current="true"] text{fill:#fff}
+.dl:focus{outline:none}
+.dl:focus-visible .hit{stroke:rgba(255,255,255,.18)}
+@media (hover:hover){.dl:hover text{fill:#fff}}
+.dial-hub{position:absolute;inset:27%;display:grid;place-items:center;align-content:center;text-align:center;pointer-events:none}
+.dial-hub b{font:800 calc(var(--dial) * .15)/1 var(--bc)}
+.dial-hub span{font:600 calc(var(--dial) * .062)/1.2 var(--in);letter-spacing:.1em;text-transform:uppercase;color:var(--w72);margin-top:.35em}
+
+/* ---------- services: radial stage ---------- */
+.svc{background:var(--deeper)}
+.svc-pin{position:relative;height:calc(100vh + 8 * 62vh)}
+.svc-stage{position:sticky;top:0;height:100vh;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:clamp(24px,3vw,120px);padding:0 var(--g) 0 var(--rail);overflow:hidden}
+.ring-area{position:relative;width:min(88vh,44vw);aspect-ratio:1}
+.svc-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.sr-g{transform-box:view-box;transform-origin:500px 500px}
+.sr-seg .band{fill:none;stroke:rgba(255,255,255,.07);stroke-width:74;transition:stroke .35s}
+.sr-seg text{font:600 27px var(--bc);letter-spacing:2px;fill:rgba(255,255,255,.66);transition:fill .35s}
+.sr-seg.on .band{stroke:var(--red)}
+.sr-seg.on text{fill:#fff}
+.sr-seg:focus{outline:none}
+.sr-seg:focus-visible .band{stroke:rgba(255,255,255,.3)}
+@media (hover:hover){.sr-seg:hover text{fill:#fff}}
+#slot{position:absolute;left:14%;top:14%;width:72%;height:72%;border-radius:50%}
+#slot img{width:100%;height:100%;object-fit:contain;opacity:0}
+.svc-detail{position:relative;align-self:center}
+.svc-head{margin-bottom:clamp(28px,5vh,120px)}
+
+.rail-top{display:none}
+.rows{list-style:none;margin:0;padding:0;display:grid}
+.row{grid-area:1/1;display:grid;grid-template-columns:1fr auto;gap:0 clamp(16px,2vw,80px);align-items:center}
+.row:not(.on){visibility:hidden}
+.row.is-in{animation:ansIn .45s var(--ease) both}
+.row .rn{grid-column:1/-1;display:flex;align-items:center;gap:.8em;margin:0 0 .6em;font:600 var(--small)/1 var(--in);letter-spacing:.12em;color:var(--w72)}
+.row .rn i{display:grid;place-items:center;width:2.6em;height:2.6em;border-radius:50%;background:var(--red);color:#fff;font-style:normal}
+.row h3{margin:0;font:600 var(--h3)/1.15 var(--in);letter-spacing:-.01em}
+.row p{margin:.8em 0 0;max-width:42ch;color:var(--w72)}
+.row .tag{font:600 var(--small)/1.4 var(--in);letter-spacing:.12em;text-transform:uppercase;color:var(--w60)}
+.row-img{width:clamp(130px,13vw,520px);height:auto;aspect-ratio:1;object-fit:cover;clip-path:circle(50%);grid-row:2/5;grid-column:2}
+.row .txt{grid-column:1;grid-row:2/5}
+
+/* ---------- sidewall decoder (light spec sheet on an arc) ---------- */
+.spec{background:var(--grey);color:var(--deep);padding:var(--sp) var(--g) calc(var(--sp) + var(--arc)) var(--rail)}
+.spec.arced::after{border-top-color:rgba(15,37,64,.2)}
+.spec .eyebrow{color:var(--deep)}
+.spec .sec-p{color:#33475f;margin:0}
+.spec-head{display:grid;grid-template-columns:1fr 1fr;gap:24px 64px;align-items:end;margin-bottom:clamp(8px,1vw,40px)}
+.decoder{position:relative;width:100%;min-height:200px}
+.dec-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.dec-svg .pt{font:800 128px var(--bc);fill:var(--deep);transition:fill .25s;cursor:pointer}
+.dec-svg .pt.on{fill:var(--red)}
+.dec-svg .sl{font:800 128px var(--bc);fill:rgba(15,37,64,.3)}
+.part{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;gap:.4em;transform:translate(-50%,-50%)}
+.part .c{display:grid;place-items:center;width:clamp(52px,5.6vw,210px);aspect-ratio:1;border-radius:50%;border:2px solid var(--deep);font:800 clamp(20px,2vw,80px)/1 var(--bc);transition:background-color .25s,color .25s,border-color .25s}
+.part .lbl{font:600 clamp(11px,calc(7px + .3vw),20px)/1 var(--in);letter-spacing:.1em;text-transform:uppercase;color:#33475f;white-space:nowrap}
+.part[aria-pressed="true"] .c{background:var(--red);border-color:var(--red);color:#fff}
+.part[aria-pressed="true"] .lbl{color:var(--red)}
+@media (hover:hover){.part:hover .c{border-color:var(--red)}}
+.explain{display:grid;grid-template-columns:minmax(200px,1fr) 2fr;gap:20px 64px;margin-top:clamp(16px,2vw,60px);padding-top:28px;border-top:2px solid var(--deep);min-height:190px;align-content:start}
+.ex-k{margin:0 0 8px;font:600 var(--small)/1.2 var(--in);letter-spacing:.12em;text-transform:uppercase;color:#33475f}
+.ex-v{margin:0;font:600 clamp(28px,2.4vw,96px)/1.1 var(--in);letter-spacing:-.02em}
+.ex-t{margin:0;line-height:1.55;max-width:52ch;color:#1d324d;font-size:calc(var(--body) * 1.12)}
+.ex-swap{animation:ansIn .4s var(--ease) both}
+.size-use{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:24px}
+.size-use .btn{border:1.5px solid var(--deep);color:var(--deep);min-height:clamp(56px,3.8vw,140px)}
+.size-use .btn .ic{background:var(--deep);color:#fff;width:calc(clamp(56px,3.8vw,140px) - .9em);height:calc(clamp(56px,3.8vw,140px) - .9em)}
+.size-note{margin:0;font-size:.9em;color:#33475f}
+.size-note a{color:var(--deep);font-weight:600}
+.photo-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 40px;margin-top:clamp(40px,4vw,140px);padding:28px 0;border-top:1px solid rgba(15,37,64,.25)}
+.photo-cta p{margin:0;font:600 clamp(22px,1.9vw,76px)/1.2 var(--in);letter-spacing:-.01em;max-width:26ch}
+.photo-cta .btn.wa{background:var(--deep);border-color:var(--deep)}
+.brands{margin:20px 0 0;color:#33475f;max-width:80ch}
+
+/* ---------- coverage ---------- */
+.cov{background:var(--deep);padding:var(--sp) var(--g) calc(var(--sp) + var(--arc)) var(--rail);display:grid;grid-template-columns:5fr 7fr;gap:48px clamp(32px,4vw,160px);align-items:center}
+.towns{list-style:none;margin:2em 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:24px}
+.towns li{border-top:1px solid var(--rule);padding:.5em 0;font:500 clamp(16px,calc(12px + .3vw),22px)/1.3 var(--in);color:var(--w72)}
+.towns li:first-child{color:#fff}
+.towns li:first-child::before{content:"";display:inline-block;width:.4em;height:.4em;border-radius:50%;background:var(--red);margin-right:.5em;vertical-align:.1em}
+.map{width:100%;height:auto;display:block}
+.map .ring{transform-box:view-box;transform-origin:936.2px 436.4px}
+.js .map .ring{transform:scale(.12);opacity:0;transition:transform 1.5s var(--ease),opacity .6s}
+.js .map.in .ring{transform:none;opacity:1}
+.map .lab{font:500 21px var(--in);fill:rgba(255,255,255,.8)}
+.map .dover{font:800 40px var(--bc);fill:#fff;letter-spacing:.04em}
+
+/* ---------- reviews: a circular carousel ---------- */
+.rev{background:var(--deeper);padding:var(--sp) var(--g) calc(var(--sp) + var(--arc)) var(--rail);display:grid;grid-template-columns:minmax(0,.8fr) auto;gap:32px clamp(32px,4vw,160px);align-items:center}
+.rev-nav{display:flex;gap:12px;margin-top:2em}
+.rbtn{display:grid;place-items:center;width:clamp(56px,4vw,150px);aspect-ratio:1;border-radius:50%;border:1.5px solid rgba(255,255,255,.45)}
+.rbtn svg{width:40%;height:40%}
+@media (hover:hover){.rbtn:hover{border-color:#fff}}
+.rv-count{margin:1.4em 0 0;font:700 clamp(20px,1.4vw,56px)/1 var(--bc);letter-spacing:.06em;color:var(--w72)}
+.rv-wheel{position:relative;width:min(84vh,50vw);aspect-ratio:1;touch-action:pan-y}
+.rv-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.rv-g{transform-box:view-box;transform-origin:500px 500px}
+.rv-name text{font:700 30px var(--bc);letter-spacing:3px;fill:rgba(255,255,255,.62);transition:fill .3s}
+.rv-name.on text{fill:#fff}
+.rv-name .dot{fill:rgba(255,255,255,.4)}
+.rv-name.on .dot{fill:var(--red)}
+.rv-name:focus{outline:none}
+.rv-name:focus-visible text{fill:#fff;text-decoration:underline}
+.rail{position:absolute;inset:20%;display:grid;align-items:center;margin:0}
+.q{grid-area:1/1;margin:0;text-align:center}
+.q:not(.on){visibility:hidden}
+.q.is-in{animation:ansIn .45s var(--ease) both}
+.q blockquote{margin:0;font:400 clamp(17px,1.25vw,48px)/1.5 var(--in)}
+.q blockquote::before{content:"\201C";display:block;font:800 2.4em/.6 var(--bc);color:var(--red);margin-bottom:.25em}
+.q figcaption{margin-top:1.2em;font-size:.85em;color:var(--w72)}
+.q figcaption b{color:#fff;font-weight:600}
+.rv-prog{display:none}
+
+/* ---------- contact + radial service ticket ---------- */
+.contact{background:var(--deep);padding:var(--sp) var(--g) calc(var(--sp) + var(--arc)) var(--rail)}
+.c-top{display:grid;grid-template-columns:1fr auto;gap:32px clamp(32px,4vw,160px);align-items:center}
+.big-num{display:inline-block;margin:.25em 0 .1em;font:700 clamp(44px,4.6vw,180px)/1 var(--bc);letter-spacing:.01em;text-decoration:none;white-space:nowrap}
+.c-sub{margin:0;color:var(--w72)}
+.c-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:1.6em}
+.c-mail{display:inline-block;margin-top:.6em;color:var(--w72);min-height:48px;line-height:48px}
+.cdial{width:clamp(220px,22vw,860px);aspect-ratio:1}
+.cdial svg{width:100%;height:100%;overflow:visible}
+.cdial .dt{font:800 44px var(--bc);fill:#fff;letter-spacing:4px}
+.cdial-spin{transform-box:view-box;transform-origin:250px 250px}
+.ticket{position:relative;margin-top:clamp(48px,5vw,200px);padding-top:clamp(24px,2vw,80px);border-top:1px solid var(--rule)}
+.tk-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px;font:600 var(--small)/1.4 var(--in);letter-spacing:.12em;text-transform:uppercase;color:var(--w72)}
+.tk-t{margin:.4em 0 0;font:600 var(--h2)/1.12 var(--in);letter-spacing:-.02em}
+.tk-p{margin:.4em 0 1.2em;color:var(--w72)}
+.tk-radial{position:relative;display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"f1 hub f3" "f2 hub f4" "f5 note alt";gap:clamp(18px,2vw,80px) clamp(24px,3vw,120px);align-items:center}
+.tk-orbit{position:absolute;left:50%;top:0;width:calc(var(--hub) * 1.9);aspect-ratio:1;transform:translate(-50%,calc(var(--hub) * -.2));pointer-events:none}
+.tk-orbit svg{width:100%;height:100%;overflow:visible}
+.tk-radial{--hub:clamp(190px,15vw,600px)}
+.fld{position:relative;min-width:0}
+.fld[data-f="name"]{grid-area:f1}.fld[data-f="phone"]{grid-area:f2}.fld[data-f="need"]{grid-area:f3}.fld[data-f="where"]{grid-area:f4}.fld[data-f="size"]{grid-area:f5}
+.fld label{display:flex;align-items:center;gap:.7em;margin-bottom:.55em;font:600 var(--small)/1.3 var(--in);letter-spacing:.1em;text-transform:uppercase}
+.fld label i{font-style:normal;display:grid;place-items:center;flex:none;width:2.7em;height:2.7em;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);letter-spacing:.04em;transition:background-color .12s,color .12s,border-color .12s}
+.fld label em{font-style:normal;font-weight:500;letter-spacing:.06em;text-transform:none;color:var(--w72)}
+.fld[data-f="need"] label,.fld[data-f="where"] label{flex-direction:row}
+.fld.lit label i{background:var(--red);border-color:var(--red);color:#fff}
+.fld input,.fld select{display:block;width:100%;min-height:clamp(52px,3.4vw,130px);padding:0 1.1em;font:500 clamp(17px,calc(12px + .35vw),24px)/1.2 var(--in);color:var(--deep);background-color:#fff;border:2px solid #fff;border-radius:999px;-webkit-appearance:none;appearance:none}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%230F2540' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1em center;background-size:1.2em;padding-right:2.6em}
+.fld input:focus-visible,.fld select:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.fld [aria-invalid="true"]{border-color:var(--red);box-shadow:0 0 0 2px var(--red)}
+.err[hidden]{display:none}
+.err{display:flex;gap:.5em;align-items:baseline;margin:.6em 0 0 .4em;color:#fff;font:600 .9em/1.4 var(--in)}
+.err::before{content:"Error:";color:#fff;background:var(--red);padding:.05em .5em;border-radius:999px;font-size:.85em}
+.hint{margin:.5em 0 0 .4em;color:var(--w72);font-size:.85em}
+.tk-hub{grid-area:hub;justify-self:center}
+.tk-btn{position:relative;display:grid;place-items:center;align-content:center;gap:.3em;width:var(--hub);aspect-ratio:1;border-radius:50%;background:var(--red);color:#fff;text-align:center;font-size:clamp(16px,1.1vw,42px)}
+.tk-btn svg{width:2em;height:2em;color:#fff}
+.tk-btn b{font:700 1.9em/1 var(--bc);letter-spacing:.02em}
+.tk-btn small{font:500 .8em/1.2 var(--in);opacity:.9}
+.tk-btn::after{content:"";position:absolute;inset:-10px;border-radius:50%;border:2px dashed rgba(216,24,0,.6)}
+@media (hover:hover){.tk-btn:hover{background:#B81400}}
+.tk-note{grid-area:note;margin:0;text-align:center;font-size:.9em;color:var(--w72);max-width:26ch;justify-self:center}
+.tk-alt{grid-area:alt;margin:0;font-size:1em}
+.tk-alt a{font-weight:600;display:inline-block;min-height:48px;line-height:48px}
+
+.ft{position:relative;z-index:2;background:var(--deeper);padding:clamp(40px,3vw,120px) var(--g) clamp(40px,3vw,120px) var(--rail);display:flex;flex-wrap:wrap;gap:20px 48px;align-items:center;justify-content:space-between;font-size:.9em;color:var(--w72)}
+.ft p{margin:0}
+
+.thumb,.rmenu{display:none}
+
+/* ---------- phones and small tablets ---------- */
+@media (max-width:859px){
+  :root{--rail:var(--g);--arc:28px;--sp:64px}
+  .top{position:sticky;height:56px;background:var(--deep);border-bottom:1px solid var(--rule);justify-content:space-between;padding-right:4px}
+  .logo{height:26px}
+  .callfix{position:static;width:48px;height:48px;min-height:48px;padding:0;justify-content:center;box-shadow:none;background:none}
+  .callfix .ic{width:44px;height:44px;background:var(--red);color:#fff}
+  .callfix svg{width:20px;height:20px}
+  .callfix .cl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .dial-nav{display:none}
+  .hero{min-height:max(calc(100svh - 56px),560px)}
+  .hero-copy{padding:14px var(--g) 0;align-items:stretch;text-align:left}
+  .hero-copy .eyebrow::after{display:none}
+  .eb-long{display:none}
+  .slot{margin:10px 0 14px;justify-items:start}
+  .ans{align-self:start}
+  .h1{font-size:clamp(46px,14vw,64px);line-height:.92}
+  .lede{margin:10px 0 0;font-size:15px;max-width:36ch}
+  .a-t{margin:0;font-size:30px;line-height:.95;max-width:none}
+  .a-b{margin:8px 0 0;font-size:14px;line-height:1.42}
+  .cta{flex-wrap:nowrap;gap:10px;justify-content:flex-start}
+  .btn{--ctah:60px;font-size:15px;padding-right:1em}
+  .btn b{font-size:22px}
+  .cta .call{flex:1 1 auto}
+  .ring-btn{--ctah:52px;flex:none;width:68px;height:68px;font-size:14px}
+  .ring-btn::after{inset:-5px}
+  .horizon{display:flex;flex-direction:column;min-height:0}
+  .triage{position:static;display:grid;grid-template-columns:1fr 1fr;column-gap:16px;padding:12px var(--g) 0}
+  .triage li{position:static;transform:none!important;white-space:normal}
+  .t{width:100%;min-height:56px;padding:4px 0;font-size:clamp(19px,5.6vw,23px);border-top:1px solid rgba(255,255,255,.2);justify-content:flex-start;line-height:1}
+  .t::before{left:0;right:0;bottom:6px}
+  .t sup{transform:none;font-size:10px}
+  .arcbox{position:relative;inset:auto;flex:1 1 auto;min-height:118px;overflow:hidden}
+  .tyre{--D:220vw;top:14px;clip-path:circle(50%);pointer-events:auto;touch-action:pan-y}
+  .tyre-ghost{display:none}
+
+  .svc-pin{height:auto}
+  .svc-stage{position:static;height:auto;display:block;padding:var(--sp) 0 calc(var(--sp) + var(--arc));overflow:visible}
+  .ring-area{display:none}
+  .svc-head{padding:0 var(--g);margin-bottom:22px}
+  .rail-top{display:flex;align-items:center;justify-content:space-between;padding:0 var(--g);margin-bottom:10px;font:600 12px/1 var(--in);letter-spacing:.12em;text-transform:uppercase;color:var(--w72)}
+  .rail-top .ind{display:flex;align-items:center;gap:12px}
+  .rail-top .ind b{font:700 20px/1 var(--bc);color:#fff;letter-spacing:.02em}
+  .mini{width:56px;height:56px}
+  .mini-spin{transform-box:view-box;transform-origin:50px 50px}
+  .rows{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--g);padding:0 var(--g) 4px;scrollbar-width:none;overscroll-behavior-x:contain}
+  .rows::-webkit-scrollbar{display:none}
+  .row{flex:0 0 84%;visibility:visible!important;display:block;position:relative;scroll-snap-align:start;padding:0 20px 26px;text-align:center}
+  .row::before{content:"";position:absolute;inset:34px 0 0;background:var(--deep);clip-path:ellipse(92% 100% at 50% 100%);z-index:-1}
+  .rows{isolation:isolate}
+  .row-img{width:62%;margin:0 auto;border:0}
+  .row .rn{justify-content:center;margin:14px 0 6px}
+  .row h3{font-size:21px}
+  .row p{font-size:15px;margin-left:auto;margin-right:auto}
+  .row .tag{margin-top:8px;font-size:11px}
+
+  .spec-head{grid-template-columns:1fr;margin-bottom:8px}
+  .explain{grid-template-columns:1fr;gap:10px;min-height:250px}
+  .ex-t{font-size:16px}
+  .size-use .btn,.photo-cta .btn{width:100%}
+
+  .cov{grid-template-columns:1fr}
+  .map .lab{display:none}
+
+  .rev{grid-template-columns:1fr;padding-left:0;padding-right:0}
+  .rev-intro{padding:0 var(--g)}
+  .rev-nav,.rv-count{display:none}
+  .rv-wheel{width:100%;min-width:0;aspect-ratio:auto}
+  .rev > *{min-width:0}
+  .rv-ring{display:none}
+  .rail{position:static;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--g);padding:0 var(--g);scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .q{flex:0 0 86%;visibility:visible!important;scroll-snap-align:start;text-align:left;border-top:2px solid rgba(255,255,255,.85);padding-top:18px}
+  .q:last-child{margin-right:var(--g)}
+  .q blockquote{font-size:18px}
+  .rv-prog{display:flex;align-items:center;gap:12px;padding:18px var(--g) 0;font:700 20px/1 var(--bc);color:var(--w72)}
+  .rv-prog svg{width:44px;height:44px;transform:rotate(-90deg)}
+
+  .c-top{grid-template-columns:1fr}
+  .big-num{font-size:clamp(40px,12vw,56px)}
+  .c-links .btn{flex:1 1 auto}
+  .cdial{width:220px;justify-self:center}
+  .tk-radial{display:block}
+  .tk-orbit{display:none}
+  .fld{padding:14px 0 10px;border-top:1px solid var(--rule)}
+  .tk-hub{margin-top:18px}
+  .tk-btn{width:100%;aspect-ratio:auto;min-height:64px;border-radius:999px;grid-auto-flow:column;gap:12px;font-size:16px}
+  .tk-btn b{font-size:24px}
+  .tk-btn svg{width:24px;height:24px}
+  .tk-btn::after{inset:-5px}
+  .tk-note{text-align:left;max-width:none;margin-top:14px}
+  .tk-alt{margin-top:10px}
+
+  .ft{padding-bottom:120px}
+  .thumb{display:flex;align-items:stretch;position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--deeper);padding-bottom:env(safe-area-inset-bottom);transform:translateY(130%);transition:transform .35s var(--ease)}
+  .thumb.show{transform:none}
+  .thumb > a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:64px;text-decoration:none;color:#fff}
+  .thumb .tb-call{flex:1 1 auto;background:var(--red);padding:0 8px}
+  .thumb .tb-wa{flex:0 0 74px;flex-direction:column;gap:3px;background:var(--navy);font:700 15px/1 var(--bc);letter-spacing:.02em}
+  .thumb svg{width:20px;height:20px;flex:none}
+  .thumb span{display:flex;flex-direction:column;line-height:1}
+  .thumb small{font:500 11px/1.2 var(--in);opacity:.9;margin-bottom:3px}
+  .thumb b{font:700 21px/1 var(--bc);letter-spacing:.02em;white-space:nowrap}
+  .tb-menu{flex:0 0 72px;display:grid;place-items:center;background:var(--deeper);position:relative}
+  .tb-menu .disc{width:62px;height:62px;margin-top:-22px;border-radius:50%;background:var(--deep);border:2px solid rgba(255,255,255,.7);display:grid;place-items:center;box-shadow:0 -4px 16px rgba(4,11,22,.4)}
+  .tb-menu svg{width:40px;height:40px}
+  .tb-menu[aria-expanded="true"] .disc{border-color:var(--red)}
+  .rmenu{display:block;position:fixed;inset:0;z-index:59;background:rgba(7,20,38,.7)}
+  .rmenu[hidden]{display:none}
+  .rm-fan{position:absolute;left:50%;bottom:0;transform:translateX(-50%);background:var(--deeper);clip-path:ellipse(50% 100% at 50% 100%);border-top:2px dashed rgba(255,255,255,.2)}
+  .rm-fan::after{content:"";position:absolute;inset:14px;clip-path:ellipse(50% 100% at 50% 100%);border:2px dashed rgba(255,255,255,.14);border-radius:50% 50% 0 0/100% 100% 0 0}
+  .rm-list{list-style:none;margin:0;padding:0}
+  .rm-list li{position:absolute;left:0;top:0;width:0;height:0}
+  .rm-i{display:grid;place-items:center;align-content:center;gap:3px;width:68px;height:68px;border-radius:50%;background:var(--deep);border:1.5px solid rgba(255,255,255,.55);font:600 12px/1.1 var(--in);text-align:center;text-decoration:none;white-space:nowrap;transform:translate(-50%,-50%)}
+  .rm-i i{font:700 15px/1 var(--bc);font-style:normal;color:var(--w72)}
+  .rm-i[aria-current="true"]{border-color:var(--red)}
+  .rm-i[aria-current="true"]{background:var(--red)}
+  .rm-i[aria-current="true"] i{color:#fff}
+}
+@media (max-width:359px){
+  .btn{padding-right:.7em;gap:.5em}
+  .btn b{font-size:20px}
+  .thumb b{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .map .ring{transform:none;opacity:1}
+  #slot img{opacity:1}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.2-.3-.2-.5-.3z"/></symbol>
+  <symbol id="i-dial" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="2.6 2.6"/><circle cx="20" cy="20" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 1l-3.5 5h7z" fill="#D81800"/></symbol>
+</svg>
+
+<header class="top">
+  <a class="brand" href="#top" aria-label="Road Max, back to top"><img data-rm-logo="v4" class="logo" src="files/assets/images/roadmax/roadmax-logo-compact-white.svg" alt="Road Max"></a>
+  <a class="callfix" href="tel:01304350200"><span class="ic"><svg aria-hidden="true"><use href="#i-phone"/></svg></span><span class="cl">Call 01304 350200</span></a>
+</header>
+
+<main>
+<!-- ================= HERO: the horizon tyre ================= -->
+<section class="hero" id="top" aria-labelledby="h1">
+  <div class="hero-copy">
+    <p class="eyebrow"><span>24/7<span class="eb-long"> mobile tyre fitting</span> · Dover &amp; Kent</span></p>
+    <div class="slot" aria-live="polite">
+      <div class="ans is-on" data-a="q">
+        <h1 class="h1" id="h1">What’s happened?</h1>
+        <p class="lede"><span class="eb-long">Choose what’s happened on the tyre and we’ll show you what we’ll do. Or call now: </span>Road Max is open 24/7, 365 days a year, at home, at work or at the roadside.</p>
+      </div>
+      <div class="ans" data-a="0"><p class="a-k"><i>01</i>Flat tyre</p><p class="a-t">Flat tyre? We come to you.</p><p class="a-b">At home, at work or at the roadside. We check it where you are, then repair it or fit a new tyre: premium, mid-range or budget.</p></div>
+      <div class="ans" data-a="1"><p class="a-k"><i>02</i>Puncture</p><p class="a-t">Puncture? Repaired where you are.</p><p class="a-b">Mobile tyre repair, 24/7. If the tyre can’t be safely repaired, we fit a new one where you are.</p></div>
+      <div class="ans" data-a="2"><p class="a-k"><i>03</i>Blowout</p><p class="a-t">Blowout? Get safe. We’ll bring the tyre.</p><p class="a-b">Emergency tyre fitting, 365 days a year. We replace it where you are, or recover the vehicle if it can’t be fixed there.</p></div>
+      <div class="ans" data-a="3"><p class="a-k"><i>04</i>Locked wheel nut</p><p class="a-t">No locking key? We’ll get it off.</p><p class="a-b">Wheel nut removal, including locking wheel nuts, so the wheel can come off and the tyre can be repaired or replaced.</p></div>
+      <div class="ans" data-a="4"><p class="a-k"><i>05</i>Flat battery</p><p class="a-t">Flat battery? Jump start or a new one.</p><p class="a-b">Jump starts and battery replacement where you’ve stopped: at home, at work or at the roadside.</p></div>
+    </div>
+    <div class="cta" id="heroCta">
+      <a class="btn call" href="tel:01304350200"><span class="ic"><svg aria-hidden="true"><use href="#i-phone"/></svg></span><span class="tx"><small>Call 24/7</small><b>01304 350200</b></span></a>
+      <a class="ring-btn" id="heroWa" href="https://wa.me/447842290576" target="_blank" rel="noopener" aria-label="WhatsApp 07842 290576"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg><span>WhatsApp</span><span class="vh" id="waNote">Message us</span></a>
+    </div>
+  </div>
+  <div class="horizon" id="horizon">
+    <ul class="triage" id="triage" aria-label="What’s happened? Choose one">
+      <li><button class="t" type="button" data-i="0" aria-pressed="false"><sup>01</sup>Flat tyre</button></li>
+      <li><button class="t" type="button" data-i="1" aria-pressed="false"><sup>02</sup>Puncture</button></li>
+      <li><button class="t" type="button" data-i="2" aria-pressed="false"><sup>03</sup>Blowout</button></li>
+      <li><button class="t" type="button" data-i="3" aria-pressed="false"><sup>04</sup>Locked wheel nut</button></li>
+      <li><button class="t" type="button" data-i="4" aria-pressed="false"><sup>05</sup>Flat battery</button></li>
+    </ul>
+    <div class="arcbox">
+      <div class="tyre-ghost" aria-hidden="true"></div>
+      <div class="tyre-layer" aria-hidden="true">
+        <div class="tyre" id="tyre">
+          <div class="spin" id="spin"></div>
+          <svg class="light" viewBox="0 0 1000 1000" focusable="false">
+            <g fill="none" stroke="#fff" stroke-linecap="round"><path id="lt1" stroke-opacity=".5" stroke-width="2.5"/><path id="lt2" stroke-opacity=".16" stroke-width="2"/><path id="lt3" stroke-opacity=".26" stroke-width="2"/></g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SERVICES: a ring around the tyre ================= -->
+<section class="svc arced" id="services" aria-labelledby="svcH">
+  <div class="svc-pin" id="svcPin">
+    <div class="svc-stage">
+      <div class="ring-area" id="ringArea">
+        <svg class="svc-ring" viewBox="0 0 1000 1000" aria-label="Services ring">
+          <defs><path id="srP" d=""/></defs>
+          <circle cx="500" cy="500" r="498" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+          <circle cx="500" cy="500" r="384" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+          <g class="sr-g" id="srG"></g>
+          <path d="M500 -34 L482 -6 L518 -6 Z" fill="#D81800"/>
+        </svg>
+        <div id="slot"><img src="files/assets/images/step-vehicle.webp" alt="" width="404" height="421" loading="lazy"></div>
+      </div>
+      <div class="svc-detail">
+        <header class="svc-head">
+          <p class="eyebrow">Services · around the tread</p>
+          <h2 class="h2" id="svcH">Eight ways back on the road.</h2>
+        </header>
+        <div class="rail-top" aria-hidden="true"><span>Swipe</span><span class="ind"><b id="railN">01 / 08</b>
+          <svg class="mini" viewBox="0 0 100 100"><g class="mini-spin" id="miniSpin"><circle cx="50" cy="50" r="38" fill="none" stroke="#0F2540" stroke-width="16"/><circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="12" stroke-dasharray="5 4.95"/><g id="miniIdx"></g><circle cx="50" cy="50" r="24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/></g><path d="M50 0 L43 9 L57 9 Z" fill="#D81800"/></svg></span></div>
+        <ol class="rows" id="rows">
+          <li class="row on" data-i="0"><p class="rn"><i>01</i>of 08</p><img class="row-img" src="files/assets/images/rm/rm-v4-home.webp" alt="A car on a home driveway" width="1360" height="1020" loading="lazy"><div class="txt"><h3>Mobile tyre fitting</h3><p>New tyres fitted at home, at work or at the roadside: premium, mid-range or budget, for cars, vans and 4x4s. The price includes fitting, a new valve, wheel balancing and old-tyre disposal.</p><p class="tag">Michelin · Bridgestone · Continental · Goodyear · Pirelli · Dunlop</p></div></li>
+          <li class="row" data-i="1"><p class="rn"><i>02</i>of 08</p><img class="row-img" src="files/assets/images/hero-tyre-change.webp" alt="A technician changing a wheel" width="1500" height="1662" loading="lazy"><div class="txt"><h3>Emergency tyre fitting</h3><p>24 hours a day, 365 days a year. When a tyre fails, we come to you and replace it where you are.</p><p class="tag">Day or night · Roadside</p></div></li>
+          <li class="row" data-i="2"><p class="rn"><i>03</i>of 08</p><img class="row-img" src="files/assets/images/hero-gloved-hands.webp" alt="Gloved hands checking a tyre" width="1800" height="1200" loading="lazy"><div class="txt"><h3>Mobile tyre repair</h3><p>Punctures repaired at home, at work or at the roadside, whenever the tyre can be safely repaired.</p><p class="tag">Punctures</p></div></li>
+          <li class="row" data-i="3"><p class="rn"><i>04</i>of 08</p><img class="row-img" src="files/assets/images/rm/rm-v4-carpark.webp" alt="A car in a car park" width="765" height="1020" loading="lazy"><div class="txt"><h3>Jump starts</h3><p>Flat battery? We get the engine running again where you’ve stopped.</p><p class="tag">Roadside help</p></div></li>
+          <li class="row" data-i="4"><p class="rn"><i>05</i>of 08</p><img class="row-img" src="files/assets/images/rm/rm-v4-country.webp" alt="A 4x4 on a village road" width="765" height="1020" loading="lazy"><div class="txt"><h3>Breakdown recovery</h3><p>When it can’t be fixed where it stopped, we recover the vehicle.</p><p class="tag">Roadside help</p></div></li>
+          <li class="row" data-i="5"><p class="rn"><i>06</i>of 08</p><img class="row-img" src="files/assets/images/rm/rm-v4-hero.webp" alt="A car parked on a street at night" width="1600" height="900" loading="lazy"><div class="txt"><h3>Battery replacement</h3><p>A new battery fitted where you are, at home, at work or at the roadside.</p><p class="tag">Batteries</p></div></li>
+          <li class="row" data-i="6"><p class="rn"><i>07</i>of 08</p><img class="row-img" src="files/assets/images/rm/rm-v4-jack.webp" alt="A car on a jack with the wheel off" width="765" height="1020" loading="lazy"><div class="txt"><h3>Wheel nut removal</h3><p>Seized wheel nuts and locking wheel nuts without the key, removed so the wheel can come off.</p><p class="tag">Including locking nuts</p></div></li>
+          <li class="row" data-i="7"><p class="rn"><i>08</i>of 08</p><img class="row-img" src="files/assets/images/premium-tread-v.webp" alt="Close-up of tyre tread" width="1400" height="2100" loading="lazy"><div class="txt"><h3>Part-worn tyres</h3><p>Part-worn tyres, checked to BS AU 159 before they are fitted.</p><p class="tag">Checked to BS AU 159</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= READ YOUR SIDEWALL ================= -->
+<section class="spec arced" id="sidewall" aria-labelledby="specH">
+  <div class="spec-head">
+    <div><p class="eyebrow">Tyre size decoder · spec sheet</p><h2 class="h2" id="specH">Read your sidewall.</h2></div>
+    <p class="sec-p">Your tyre size is moulded into the sidewall of every tyre, on a curve like the one below. Tap each part to see what it means, then add it to your callback.</p>
+  </div>
+  <div class="decoder" id="decoder">
+    <svg class="dec-svg" id="decSvg" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMin meet" aria-hidden="true">
+      <defs><path id="decP" d=""/><path id="decQ" d=""/></defs>
+      <use href="#decQ" fill="none" stroke="#0F2540" stroke-opacity=".3" stroke-width="2"/>
+      <g id="decTicks" stroke="#0F2540" stroke-opacity=".3" stroke-width="2"></g>
+      <g id="decText"></g>
+    </svg>
+    <div role="group" aria-label="Tyre size 205/55 R16 91V. Choose a part to explain it" id="decBtns">
+      <button class="part" type="button" data-p="0" aria-pressed="true"><span class="c">205</span><span class="lbl">01 Width</span></button>
+      <button class="part" type="button" data-p="1" aria-pressed="false"><span class="c">55</span><span class="lbl">02 Profile</span></button>
+      <button class="part" type="button" data-p="2" aria-pressed="false"><span class="c">R16</span><span class="lbl">03 Rim</span></button>
+      <button class="part" type="button" data-p="3" aria-pressed="false"><span class="c">91</span><span class="lbl">04 Load</span></button>
+      <button class="part" type="button" data-p="4" aria-pressed="false"><span class="c">V</span><span class="lbl">05 Speed</span></button>
+    </div>
+  </div>
+  <div class="explain" id="explain" aria-live="polite">
+    <div><p class="ex-k" id="exK">01 · Width</p><p class="ex-v" id="exV">205 mm</p></div>
+    <p class="ex-t" id="exT">How wide the tyre is from one sidewall to the other, in millimetres. 205 is one of the most common widths on family cars.</p>
+  </div>
+  <div class="size-use"><button class="btn" type="button" id="useSize"><span class="ic"><svg aria-hidden="true" viewBox="0 0 40 40"><use href="#i-dial"/></svg></span><span class="tx"><small>Field 05 · Tyre size</small><b>Use this size in my callback</b></span></button><p class="size-note" id="sizeNote" aria-live="polite"></p></div>
+  <div class="photo-cta">
+    <p>Not sure? Send us a photo of your tyre on WhatsApp.</p>
+    <a class="btn wa" href="https://wa.me/447842290576?text=Hi%20Road%20Max%2C%20here%20is%20a%20photo%20of%20my%20tyre.%20My%20location%20is%3A%20" target="_blank" rel="noopener"><span class="ic"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg></span><span class="tx"><small>07842 290576</small><b>Send a photo</b></span></a>
+  </div>
+  <p class="brands">No photo to hand? Your registration works too. We supply premium, mid-range and budget tyres for cars, vans and 4x4s, including Michelin, Bridgestone, Continental, Goodyear, Pirelli and Dunlop. The quoted price includes fitting, a new valve, wheel balancing and old-tyre disposal.</p>
+</section>
+
+<!-- ================= COVERAGE ================= -->
+<section class="cov arced" id="coverage" aria-labelledby="covH">
+  <div>
+    <p class="eyebrow">Coverage</p>
+    <h2 class="h2" id="covH">Dover &amp; Kent.</h2>
+    <p class="sec-p">Founded in Dover, since 2010. We come to you at home, at work or at the roadside across Kent, 24 hours a day, 365 days a year.</p>
+    <ul class="towns">
+      <li>Dover</li><li>Deal</li><li>Folkestone</li><li>Canterbury</li><li>Margate</li><li>Ramsgate</li><li>Ashford</li><li>Maidstone</li><li>Medway</li><li>Dartford</li><li>Sevenoaks</li><li>Tunbridge Wells</li><li>Whitstable</li><li>Herne Bay</li>
+    </ul>
+  </div>
+  <svg class="map" id="map" viewBox="0 0 1100 710" role="img" aria-label="Map of Kent with coverage rings radiating from Dover">
+    <path id="kent" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.38)" stroke-width="1.5" stroke-linejoin="round" d="M424.5,38.8 L441.8,43.6 L473.5,40.7 L495.0,61.4 L481.6,46.8 L502.1,46.5 L516.4,61.0 L518.5,78.2 L509.2,89.2 L486.2,91.0 L482.0,74.3 L472.8,75.0 L456.6,76.3 L444.5,86.2 L434.7,105.3 L443.3,96.4 L447.9,101.3 L438.7,108.9 L385.0,113.4 L375.2,136.4 L386.8,116.9 L403.4,134.5 L420.9,141.3 L427.2,143.8 L432.5,139.2 L428.7,143.5 L439.6,152.5 L445.3,141.0 L454.0,140.9 L449.5,152.5 L447.5,163.4 L455.8,166.6 L432.0,204.0 L405.2,197.9 L391.4,210.1 L378.4,202.4 L364.4,193.1 L362.4,179.8 L329.3,163.9 L327.3,195.8 L302.6,187.5 L289.4,191.4 L290.3,181.8 L311.5,142.1 L327.2,138.3 L326.1,130.5 L337.4,130.5 L342.6,113.9 L352.6,111.2 L351.7,79.6 L330.2,62.6 L327.9,56.8 L337.4,55.8 L330.6,52.8 L337.9,35.1 L392.9,30.0 L424.5,38.8 Z M644.4,109.5 L679.0,160.1 L641.2,180.1 L623.4,168.5 L613.5,162.1 L612.8,168.2 L601.4,160.6 L609.0,168.4 L600.6,169.7 L577.1,159.9 L548.7,162.5 L547.4,141.9 L525.0,128.3 L517.2,112.3 L524.6,118.4 L531.0,113.3 L526.9,101.0 L536.8,76.5 L559.1,81.8 L566.6,84.1 L589.6,99.6 L625.8,106.1 L644.4,109.5 Z M162.8,39.4 L200.6,67.9 L219.9,59.3 L229.4,55.2 L229.5,55.1 L236.5,71.7 L276.7,79.4 L317.9,74.9 L331.4,65.8 L330.2,62.6 L351.7,79.6 L352.6,111.2 L342.6,113.9 L337.4,130.5 L326.1,130.5 L327.2,138.3 L311.5,142.1 L290.3,181.8 L289.4,191.4 L302.6,187.5 L327.3,195.8 L329.3,163.9 L362.4,179.8 L364.4,193.1 L378.4,202.4 L391.4,210.1 L405.2,197.9 L432.0,204.0 L455.8,166.6 L447.5,163.4 L449.5,152.5 L454.0,140.9 L455.5,140.9 L450.1,157.1 L465.0,131.3 L480.7,158.8 L492.6,138.0 L503.9,137.1 L498.5,151.4 L512.0,146.5 L499.4,106.0 L521.7,101.9 L523.9,107.1 L513.3,113.8 L520.5,129.5 L547.0,149.0 L547.4,170.6 L526.3,190.0 L549.2,171.2 L582.3,175.5 L584.2,189.5 L584.8,177.9 L619.5,178.5 L622.9,180.6 L641.5,191.7 L629.4,209.3 L639.6,200.6 L654.3,208.5 L641.2,194.8 L679.2,190.1 L679.2,190.1 L718.0,186.0 L737.8,167.5 L827.3,157.2 L873.0,152.0 L873.5,151.9 L937.4,150.8 L985.9,137.6 L992.1,136.2 L1015.2,135.6 L1027.2,143.1 L1030.0,175.6 L1030.0,175.6 L1030.0,175.6 L1015.0,212.3 L1013.9,206.2 L1007.8,210.6 L1014.2,214.2 L981.7,208.6 L968.1,228.1 L967.7,228.7 L977.2,226.0 L983.9,252.7 L993.7,291.7 L1001.0,327.9 L1001.3,383.4 L994.2,404.1 L981.0,421.8 L957.0,432.9 L957.1,433.7 L956.9,433.8 L957.4,443.3 L953.9,436.9 L938.4,441.9 L943.0,452.0 L933.8,448.9 L939.2,451.6 L936.4,451.2 L946.4,455.1 L938.9,454.1 L928.3,452.8 L926.9,453.6 L926.0,454.1 L874.6,469.6 L870.9,470.1 L870.1,470.8 L866.5,473.7 L860.1,478.1 L860.0,479.2 L845.6,491.2 L852.2,495.1 L767.9,509.6 L763.8,512.8 L757.1,514.2 L712.0,553.2 L707.1,566.6 L704.3,570.6 L701.6,581.9 L689.1,616.4 L693.7,647.1 L698.7,680.1 L698.7,680.4 L611.7,667.1 L611.6,667.1 L620.7,656.6 L612.3,634.1 L602.0,629.0 L581.8,646.7 L561.6,606.8 L556.5,608.9 L557.8,592.9 L530.6,580.3 L506.6,588.3 L485.5,577.3 L474.5,560.9 L434.9,567.4 L408.7,576.7 L389.9,568.6 L386.9,556.5 L340.6,546.6 L334.2,519.1 L302.4,510.2 L286.9,487.1 L271.0,481.0 L254.6,486.0 L260.4,462.9 L243.2,461.6 L236.5,442.0 L200.2,445.2 L201.4,454.0 L179.4,451.1 L166.4,440.3 L127.7,450.5 L113.3,441.0 L120.0,425.7 L100.5,414.5 L41.6,419.7 L43.5,376.7 L30.0,338.6 L47.4,300.8 L36.2,250.0 L66.9,249.5 L66.4,223.6 L89.7,208.1 L90.1,191.8 L103.2,191.7 L113.9,162.9 L110.8,136.7 L121.2,137.1 L111.6,119.0 L114.5,118.7 L116.6,93.6 L122.6,96.2 L128.6,79.7 L150.2,67.1 L162.8,39.4 Z"/>
+    <g fill="none">
+      <circle class="ring" cx="936.2" cy="436.4" r="640" stroke="rgba(255,255,255,.16)" stroke-width="2" stroke-dasharray="3 9" style="transition-delay:.36s"/>
+      <circle class="ring" cx="936.2" cy="436.4" r="460" stroke="rgba(255,255,255,.24)" stroke-width="3" stroke-dasharray="10 8" style="transition-delay:.24s"/>
+      <circle class="ring" cx="936.2" cy="436.4" r="300" stroke="rgba(255,255,255,.36)" stroke-width="4" stroke-dasharray="14 8" style="transition-delay:.12s"/>
+      <circle class="ring" cx="936.2" cy="436.4" r="150" stroke="#D81800" stroke-width="5" stroke-dasharray="16 8"/>
+    </g>
+    <g id="towns"></g>
+  </svg>
+</section>
+
+<!-- ================= REVIEWS: quotes around a ring ================= -->
+<section class="rev arced" id="reviews" aria-labelledby="revH">
+  <div class="rev-intro">
+    <p class="eyebrow">Google reviews</p>
+    <h2 class="h2" id="revH">4.9 from 292 reviews.</h2>
+    <div class="rev-nav"><button class="rbtn" type="button" id="revPrev" aria-label="Previous review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></button><button class="rbtn" type="button" id="revNext" aria-label="Next review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></button></div>
+    <p class="rv-count" id="rvCount" aria-hidden="true">01 / 03</p>
+  </div>
+  <div class="rv-wheel" id="rvWheel">
+    <svg class="rv-ring" viewBox="0 0 1000 1000" focusable="false">
+      <defs><path id="rvP" d=""/></defs>
+      <circle cx="500" cy="500" r="496" fill="#0F2540"/>
+      <circle cx="500" cy="500" r="470" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="22" stroke-dasharray="7 9"/>
+      <circle cx="500" cy="500" r="388" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+      <g class="rv-g" id="rvG"></g>
+      <path d="M500 -30 L484 -6 L516 -6 Z" fill="#D81800"/>
+    </svg>
+    <div class="rail" id="revRail" tabindex="0" aria-label="Reviews">
+      <figure class="q on"><blockquote>Called very late at night quick to respond and attend to car, Came earlier than initially said. Very polite man takes great pride in what he does. His van and all his tools were immaculate very clean. Problem fixed within minutes beyond happy and very grateful</blockquote><figcaption><b>Christina K</b> · Google review</figcaption></figure>
+      <figure class="q"><blockquote>Very impressed, blown tyre Sunday morning and was able to replace both fronts within half an hour. Highly recommend and a decent price also!</blockquote><figcaption><b>Anton Lloyd</b> · Google review</figcaption></figure>
+      <figure class="q"><blockquote>KARWAN was exceptional, speedy, polite and efficient. Definitely recommend</blockquote><figcaption><b>Sarah Fulbrook</b> · Google review</figcaption></figure>
+    </div>
+    <div class="rv-prog" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="4"/><circle id="rvArc" cx="22" cy="22" r="18" fill="none" stroke="#D81800" stroke-width="4" stroke-dasharray="113.1" stroke-dashoffset="75.4"/></svg><span id="rvProgN">1 / 3</span></div>
+  </div>
+</section>
+
+<!-- ================= CONTACT + SERVICE TICKET ================= -->
+<section class="contact arced" id="contact" aria-labelledby="cH">
+  <div class="c-top">
+    <div>
+      <p class="eyebrow">24 hours · 365 days a year</p>
+      <h2 class="h2" id="cH">Stuck? Call Road Max.</h2>
+      <a class="big-num" href="tel:01304350200">01304 350200</a>
+      <p class="c-sub">Mobile tyre fitting, repairs and roadside help across Dover &amp; Kent.</p>
+      <div class="c-links">
+        <a class="btn call" href="tel:01304350200"><span class="ic"><svg aria-hidden="true"><use href="#i-phone"/></svg></span><span class="tx"><small>Call 24/7</small><b>01304 350200</b></span></a>
+        <a class="btn wa" href="https://wa.me/447842290576?text=Hi%20Road%20Max%2C%20I%20need%20help.%20My%20location%20is%3A%20" target="_blank" rel="noopener"><span class="ic"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg></span><span class="tx"><small>07842 290576</small><b>WhatsApp</b></span></a>
+      </div>
+      <a class="c-mail" href="mailto:info@k1dovertyres.co.uk">info@k1dovertyres.co.uk</a>
+    </div>
+    <div class="cdial" aria-hidden="true">
+      <svg viewBox="0 0 500 500" focusable="false">
+        <defs><path id="dialP" d="M250 250 m-178 0 a178 178 0 1 1 356 0 a178 178 0 1 1 -356 0"/></defs>
+        <circle cx="250" cy="250" r="246" fill="#0A1B30"/>
+        <g class="cdial-spin" id="dialSpin">
+          <circle cx="250" cy="250" r="232" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="24" stroke-dasharray="9 7.2"/>
+          <circle cx="250" cy="250" r="216" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+          <text class="dt"><textPath href="#dialP" textLength="1110" lengthAdjust="spacing">CALL 01304 350200 · 24/7 · CALL 01304 350200 · 24/7 ·</textPath></text>
+          <circle cx="250" cy="250" r="138" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+        </g>
+        <circle cx="250" cy="250" r="120" fill="#0F2540"/>
+        <text x="250" y="244" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="76" fill="#fff">24/7</text>
+        <text x="250" y="284" text-anchor="middle" font-family="Inter" font-weight="600" font-size="15" letter-spacing="3" fill="rgba(255,255,255,.72)">DOVER &amp; KENT</text>
+        <path d="M250 -18 L240 -4 L260 -4 Z" fill="#D81800"/>
+      </svg>
+    </div>
+  </div>
+
+  <form class="ticket" id="callback" novalidate aria-labelledby="tkH">
+    <div class="tk-meta"><span>Service ticket</span><span>Road Max · 24/7 · Dover &amp; Kent</span></div>
+    <h3 class="tk-t" id="tkH">Request a callback.</h3>
+    <p class="tk-p">Fill in the ticket and we’ll call you back.</p>
+    <div class="tk-radial">
+      <div class="tk-orbit" aria-hidden="true"><svg viewBox="0 0 400 400"><circle cx="200" cy="200" r="196" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/><circle cx="200" cy="200" r="150" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="10" stroke-dasharray="3 5"/><g stroke="rgba(255,255,255,.3)" stroke-width="1.5"><line x1="4" y1="120" x2="60" y2="140"/><line x1="4" y1="260" x2="60" y2="240"/><line x1="396" y1="120" x2="340" y2="140"/><line x1="396" y1="260" x2="340" y2="240"/><line x1="60" y1="360" x2="100" y2="320"/></g></svg></div>
+      <div class="fld" data-f="name"><label for="fName"><i>01</i>Name</label><input id="fName" name="name" type="text" autocomplete="name" required aria-describedby="eName"><p class="err" id="eName" hidden></p></div>
+      <div class="fld" data-f="phone"><label for="fPhone"><i>02</i>Phone</label><input id="fPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="ePhone"><p class="err" id="ePhone" hidden></p></div>
+      <div class="fld" data-f="need"><label for="fNeed"><i>03</i>What’s happened / what do you need?</label>
+        <select id="fNeed" name="need" required aria-describedby="eNeed">
+          <option value="">Choose one</option><option>Mobile tyre fitting</option><option>Emergency tyre fitting</option><option>Mobile tyre repair (puncture)</option><option>Jump start</option><option>Breakdown recovery</option><option>Battery replacement</option><option>Wheel nut removal (incl. locking nuts)</option><option>Part-worn tyres</option><option>Something else</option>
+        </select><p class="err" id="eNeed" hidden></p></div>
+      <div class="fld" data-f="where"><label for="fWhere"><i>04</i>Where are you? <em>Optional</em></label><input id="fWhere" name="where" type="text" autocomplete="off" aria-describedby="hWhere"><p class="hint" id="hWhere">Postcode, road or place.</p></div>
+      <div class="fld" data-f="size"><label for="fSize"><i>05</i>Tyre size <em>Optional</em></label><input id="fSize" name="size" type="text" autocomplete="off" aria-describedby="hSize"><p class="hint" id="hSize">For example 205/55 R16 91V. Add it from the sidewall decoder.</p></div>
+      <div class="tk-hub tk-send"><button class="tk-btn" type="submit"><svg aria-hidden="true"><use href="#i-wa"/></svg><b>Send ticket</b><small>Opens WhatsApp</small></button></div>
+      <p class="tk-note">Sending opens WhatsApp with your details filled in.</p>
+      <p class="tk-alt">In a hurry? <a href="tel:01304350200">Call 01304 350200</a></p>
+    </div>
+  </form>
+</section>
+</main>
+
+<footer class="ft">
+  <img data-rm-logo="v4" data-rm-play="view" class="logo" src="files/assets/images/roadmax/roadmax-logo-compact-white.svg" alt="Road Max">
+  <p>Road Max · 24/7 mobile tyre fitting, repairs and roadside help · Dover &amp; Kent · Founded in Dover, since 2010</p>
+</footer>
+
+<nav class="dial-nav" id="dialNav" aria-label="Sections">
+  <svg viewBox="0 0 200 200">
+    <defs><path id="dlP" d=""/></defs>
+    <circle cx="100" cy="100" r="99" fill="#0A1B30" fill-opacity=".96"/>
+    <circle cx="100" cy="100" r="93" fill="none" stroke="rgba(255,255,255,.26)" stroke-width="8" stroke-dasharray="3 4.3"/>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.2"/>
+    <g class="dl-g" id="dlG"></g>
+    <path d="M100 -6 L93 5 L107 5 Z" fill="#D81800"/>
+  </svg>
+  <div class="dial-hub" aria-hidden="true"><b id="dnHub">01</b><span id="dnLab">Start</span></div>
+</nav>
+
+<div class="rmenu" id="rmenu" hidden>
+  <div class="rm-fan" id="rmFan"></div>
+  <ul class="rm-list" id="rmList" aria-label="Sections"></ul>
+</div>
+<nav class="thumb" id="thumb" aria-label="Quick contact">
+  <a class="tb-call" href="tel:01304350200"><svg aria-hidden="true"><use href="#i-phone"/></svg><span><small>Call 24/7</small><b>01304 350200</b></span></a>
+  <button class="tb-menu" type="button" id="rmBtn" aria-expanded="false" aria-controls="rmenu" aria-label="Sections menu"><span class="disc"><svg aria-hidden="true" viewBox="0 0 40 40"><use href="#i-dial"/></svg></span></button>
+  <a class="tb-wa" id="thumbWa" href="https://wa.me/447842290576" target="_blank" rel="noopener" aria-label="WhatsApp 07842 290576"><svg class="wa-ico" aria-hidden="true"><use href="#i-wa"/></svg>WhatsApp</a>
+</nav>
+
+<script src="files/assets/js/roadmax-logo.js" defer></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+  var phoneMQ = matchMedia('(max-width: 859px)');
+  var RM = reduceMQ.matches;
+  var NS = 'http://www.w3.org/2000/svg';
+  function wa(t) { return 'https://wa.me/447842290576?text=' + encodeURIComponent(t); }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function near(cur, t) { return cur + ((((t - cur) % 360) + 540) % 360 - 180); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  /* ---------- damped spring: a turn with weight that always comes to rest ---------- */
+  function Spring(apply, k, z) { this.x = 0; this.v = 0; this.t = 0; this.k = k; this.c = 2 * z * Math.sqrt(k); this.apply = apply; this.raf = 0; }
+  Spring.prototype.to = function (t, instant) {
+    this.t = t;
+    if (instant || RM) { if (this.raf) cancelAnimationFrame(this.raf); this.raf = 0; this.x = t; this.v = 0; this.apply(t); return; }
+    if (!this.raf) { var s = this; s.last = performance.now(); s.raf = requestAnimationFrame(function f(now) { s.step(now, f); }); }
+  };
+  Spring.prototype.step = function (now, f) {
+    var dt = Math.min(0.032, (now - this.last) / 1000); this.last = now;
+    this.v += (this.k * (this.t - this.x) - this.c * this.v) * dt; this.x += this.v * dt;
+    if (Math.abs(this.t - this.x) < 0.02 && Math.abs(this.v) < 0.05) { this.x = this.t; this.v = 0; this.apply(this.x); this.raf = 0; return; }
+    this.apply(this.x); this.raf = requestAnimationFrame(f);
+  };
+
+  /* ---------- geometry helpers (SVG angles: 0 = 3 o'clock, clockwise) ---------- */
+  function Pc(cx, cy, r, a) { a = a * Math.PI / 180; return [+(cx + r * Math.cos(a)).toFixed(2), +(cy + r * Math.sin(a)).toFixed(2)]; }
+  function P(r, a) { return Pc(500, 500, r, a); }
+  function ringC(cx, cy, r, a0) { var p = Pc(cx, cy, r, a0), q = Pc(cx, cy, r, a0 + 180); return 'M' + p + ' A' + r + ' ' + r + ' 0 1 1 ' + q + ' A' + r + ' ' + r + ' 0 1 1 ' + p; }
+  function ring(r, a0) { return ringC(500, 500, r, a0); }
+  function arcC(cx, cy, r, a, b) { return 'M' + Pc(cx, cy, r, a) + ' A' + r + ' ' + r + ' 0 ' + (b - a > 180 ? 1 : 0) + ' 1 ' + Pc(cx, cy, r, b); }
+  function arc(r, a, b) { return arcC(500, 500, r, a, b); }
+  function frac(th, a0) { return ((((th - a0) % 360) + 360) % 360) / 360; }
+  function svgEl(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+
+  /* ---------- the tyre object ---------- */
+  var SLOTS = ['205/55 R16 91V', '01 · FLAT TYRE', '02 · PUNCTURE', '03 · BLOWOUT', '04 · LOCKED WHEEL NUT', '05 · FLAT BATTERY'];
+  var FRONT = 270;
+  function slotAngle(k) { return FRONT + 60 * k; }
+  function buildTyre() {
+    var A0 = 120, rA = 378, rB = 436, h = [];
+    h.push('<svg viewBox="0 0 1000 1000" focusable="false"><defs><clipPath id="alloyClip"><circle cx="500" cy="500" r="326"/></clipPath>');
+    h.push('<path id="rA" d="' + ring(rA, A0) + '"/><path id="rB" d="' + ring(rB, A0) + '"/></defs>');
+    h.push('<circle cx="500" cy="500" r="497" fill="#040B16"/><g fill="#14253C">');
+    for (var i = 0; i < 72; i++) {
+      if (i % 9 === 0) continue;
+      var a = i * 5, r1 = (i % 2) ? 476 : 471;
+      h.push('<path d="M' + P(r1, a - 1.7) + 'L' + P(494, a - 1.0) + 'L' + P(494, a + 2.1) + 'L' + P(r1, a + 1.4) + 'Z"/>');
+    }
+    h.push('</g><circle cx="500" cy="500" r="468" fill="#0A1628"/>');
+    h.push('<g fill="none" stroke="#fff"><circle cx="500" cy="500" r="463" stroke-opacity=".12" stroke-width="1.5"/><circle cx="500" cy="500" r="420" stroke-opacity=".1" stroke-width="1.2"/><circle cx="500" cy="500" r="366" stroke-opacity=".08" stroke-width="1.2"/><circle cx="500" cy="500" r="341" stroke-opacity=".14" stroke-width="1.5"/></g>');
+    h.push('<text font-family="Barlow Condensed" font-weight="800" font-size="40" fill="#fff" fill-opacity=".34"><textPath href="#rA" textLength="' + (2 * Math.PI * rA - 6).toFixed(1) + '" lengthAdjust="spacing">ROAD MAX · MOBILE TYRE FITTING · DOVER &amp; KENT · 24/7 · ROAD MAX · MOBILE TYRE FITTING · DOVER &amp; KENT · 24/7 ·</textPath></text>');
+    h.push('<g font-family="Barlow Condensed" font-weight="700" font-size="25" letter-spacing="3" text-anchor="middle">');
+    for (var k = 0; k < SLOTS.length; k++) h.push('<text class="seg' + (k ? '' : ' tech') + '" data-s="' + (k - 1) + '"><textPath href="#rB" startOffset="' + (frac(slotAngle(k), A0) * 100).toFixed(3) + '%">' + SLOTS[k] + '</textPath></text>');
+    h.push('</g><g stroke="#fff" stroke-opacity=".3" stroke-width="2">');
+    for (k = 0; k < 6; k++) { var t1 = P(430, slotAngle(k) + 30), t2 = P(458, slotAngle(k) + 30); h.push('<line x1="' + t1[0] + '" y1="' + t1[1] + '" x2="' + t2[0] + '" y2="' + t2[1] + '"/>'); }
+    h.push('</g><g font-family="Barlow Condensed" font-weight="700" font-size="19" text-anchor="middle">');
+    for (k = 0; k < 8; k++) h.push('<text class="idx" data-k="' + k + '" x="500" y="33" transform="rotate(' + (k * 45) + ' 500 500)">0' + (k + 1) + '</text>');
+    h.push('</g><circle cx="500" cy="500" r="334" fill="#0B1424"/><circle cx="500" cy="500" r="333" fill="none" stroke="#F5F5F5" stroke-opacity=".5" stroke-width="3"/>');
+    h.push('<image href="files/assets/images/premium-wheel.webp" x="-81" y="-283" width="1088" height="1543" preserveAspectRatio="none" clip-path="url(#alloyClip)"/>');
+    h.push('<circle cx="500" cy="500" r="326" fill="none" stroke="#040B16" stroke-opacity=".7" stroke-width="4"/><circle cx="500" cy="500" r="46" fill="#0F2540"/><circle cx="500" cy="500" r="35" fill="none" stroke="#D81800" stroke-width="4"/></svg>');
+    return h.join('');
+  }
+
+  var tyre = $('#tyre'), spin = $('#spin'), ghost = $('.tyre-ghost'), slotEl = $('#slot'), ringArea = $('#ringArea');
+  var layer = $('.tyre-layer'), hero = $('#top'), horizon = $('#horizon'), lis = $$('#triage li'), svcPin = $('#svcPin');
+  spin.innerHTML = buildTyre();
+  $('#lt1').setAttribute('d', arc(494, 232, 258));
+  $('#lt2').setAttribute('d', arc(455, 236, 254));
+  $('#lt3').setAttribute('d', arc(494, 284, 296));
+  var rot = new Spring(function (x) { spin.style.transform = 'rotate(' + x.toFixed(3) + 'deg)'; }, 150, 0.74);
+  var phone = phoneMQ.matches, choreo = false, sel = -1, svcIdx = 0, mode = 'hero';
+
+  function paintMarks() {
+    $$('.seg', spin).forEach(function (t) { t.classList.toggle('on', sel >= 0 && +t.getAttribute('data-s') === sel && mode === 'hero'); });
+    $$('.idx', spin).forEach(function (t) { t.classList.toggle('on', +t.getAttribute('data-k') === svcIdx && mode === 'svc'); });
+  }
+  function target() { return mode === 'svc' ? -svcIdx * 45 : FRONT - slotAngle(sel + 1); }
+  function retarget(instant) { tyre.classList.toggle('svc', mode === 'svc'); paintMarks(); if (!RM) rot.to(near(rot.x, target()), instant); }
+
+  /* triage choices ride on the curve just outside the tread (desktop) */
+  function placeChoices() {
+    if (phone) { lis.forEach(function (li) { li.style.transform = ''; }); return; }
+    var W = horizon.clientWidth, D = tyre.offsetWidth || W * 1.6, R = D / 2, top = ghost.offsetTop;
+    var lh = lis[0].offsetHeight, cx = W / 2, cy = top + R, Rc = R + lh * 0.5 + 6;
+    var ws = lis.map(function (li) { return li.offsetWidth; }), dial = $('#dialNav').getBoundingClientRect(), hz = horizon.getBoundingClientRect();
+    var gapMax = Math.max(16, (0.82 * W - ws.reduce(function (s, v) { return s + v; }, 0)) / 4), gap = gapMax, angs;
+    for (var tries = 0; tries < 40; tries++) {
+      // centres along the arc separated by half-widths plus a gap, measured as arc length
+      var pos = [0]; for (var i = 1; i < 5; i++) pos.push(pos[i - 1] + (ws[i - 1] + ws[i]) / 2 + gap);
+      var mid = pos[2]; angs = pos.map(function (p) { return FRONT + (p - mid) / Rc * 180 / Math.PI; });
+      var a0 = angs[0] * Math.PI / 180, x0 = cx + Rc * Math.cos(a0) + hz.left, y0 = cy + Rc * Math.sin(a0) + hz.top;
+      var clear = x0 - ws[0] / 2 > dial.right + 12 || y0 + lh / 2 < dial.top - 12;
+      if (clear || gap <= 16) break; gap = Math.max(16, gap * 0.85);
+    }
+    lis.forEach(function (li, i) {
+      var a = angs[i] * Math.PI / 180, x = cx + Rc * Math.cos(a), y = cy + Rc * Math.sin(a);
+      li.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + (angs[i] - FRONT).toFixed(2) + 'deg)';
+    });
+  }
+
+  function setLayout() {
+    phone = phoneMQ.matches;
+    choreo = !phone && !RM;
+    document.documentElement.classList.toggle('choreo', choreo);
+    if (!choreo) { layer.style.clipPath = ''; tyre.style.transform = ''; tyre.style.visibility = ''; mode = 'hero'; }
+    placeChoices(); layoutDecoder(); closeMenu();
+    retarget(true);
+    update();
+  }
+
+  /* ---------- hero triage ---------- */
+  var T = [
+    { k: 'flat tyre', w: 'Hi Road Max, I have a flat tyre. My location is: ' },
+    { k: 'puncture', w: 'Hi Road Max, I have a puncture. My location is: ' },
+    { k: 'blowout', w: 'Hi Road Max, I have had a blowout. My location is: ' },
+    { k: 'locked wheel nut', w: 'Hi Road Max, I have a locked wheel nut and no key. My location is: ' },
+    { k: 'flat battery', w: 'Hi Road Max, I have a flat battery. My location is: ' }
+  ];
+  var NEEDS = ['Emergency tyre fitting', 'Mobile tyre repair (puncture)', 'Emergency tyre fitting', 'Wheel nut removal (incl. locking nuts)', 'Jump start'];
+  var fNeed = $('#fNeed');
+  var btns = $$('.t'), answers = $$('.ans'), waBtn = $('#heroWa'), waNote = $('#waNote'), thumbWa = $('#thumbWa');
+  function choose(i) {
+    if (i === sel) return;
+    var prev = $('.ans.is-on'), next = answers[i + 1];
+    sel = i;
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-i') === i)); });
+    if (prev && prev !== next) {
+      prev.classList.remove('is-on', 'is-in');
+      if (!RM) { prev.classList.add('is-out'); setTimeout(function () { prev.classList.remove('is-out'); }, 240); }
+    }
+    next.classList.remove('is-out'); next.classList.add('is-on');
+    if (!RM) { next.classList.remove('is-in'); void next.offsetWidth; next.classList.add('is-in'); }
+    waBtn.href = thumbWa.href = wa(T[i].w);
+    fNeed.value = NEEDS[i];
+    waNote.textContent = 'Message ready: ' + T[i].k;
+    waBtn.setAttribute('aria-label', 'WhatsApp us about a ' + T[i].k + ', message ready');
+    if (mode === 'hero') retarget(false);
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { choose(+b.getAttribute('data-i')); }); });
+  var sx = null;
+  tyre.addEventListener('pointerdown', function (e) { if (phone) sx = e.clientX; });
+  tyre.addEventListener('pointerup', function (e) {
+    if (sx === null) return; var dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) < 28) return;
+    choose(sel < 0 ? (dx < 0 ? 0 : 4) : (sel + (dx < 0 ? 1 : -1) + 5) % 5);
+  });
+
+  /* ---------- services ring: 8 segments with names on arcs; the active one turns to 12 o'clock ---------- */
+  var rows = $$('.row'), srG = $('#srG'), srSegs = [];
+  $('#srP').setAttribute('d', ring(441, 90));
+  rows.forEach(function (r, i) {
+    var name = $('h3', r).textContent.toUpperCase(), a = -90 + i * 45;
+    var g = svgEl('a', { href: '#services', class: 'sr-seg', 'aria-label': 'Service ' + (i + 1) + ': ' + $('h3', r).textContent }, srG);
+    svgEl('path', { class: 'band', d: arc(441, a - 21.5, a + 21.5) }, g);
+    var t = svgEl('text', { 'text-anchor': 'middle', dy: '10' }, g);
+    var tp = svgEl('textPath', { href: '#srP', startOffset: (frac(a, 90) * 100).toFixed(3) + '%' }, t); tp.textContent = name;
+    g.addEventListener('click', function (e) { e.preventDefault(); goSvc(i); });
+    srSegs.push(g);
+  });
+  var srRot = new Spring(function (x) { srG.style.transform = 'rotate(' + x.toFixed(3) + 'deg)'; }, 130, 0.74);
+  function goSvc(i) {
+    if (phone) return;
+    var top = svcPin.getBoundingClientRect().top + scrollY, span = svcPin.offsetHeight - innerHeight;
+    scrollTo({ top: top + span * (i + 0.5) / 8, behavior: RM ? 'auto' : 'smooth' });
+  }
+  function setSvc(i) {
+    if (i === svcIdx) return; svcIdx = i;
+    rows.forEach(function (r, k) { r.classList.toggle('on', k === i); if (k === i && !RM && !phone) { r.classList.remove('is-in'); void r.offsetWidth; r.classList.add('is-in'); } });
+    srSegs.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+    srRot.to(near(srRot.x, -i * 45));
+    if (mode === 'svc') retarget(false);
+  }
+  srSegs[0].classList.add('on');
+
+  /* ---------- radial section dial (desktop) + radial fan menu (phones) ---------- */
+  var SECTIONS = [['top', 'Start'], ['services', 'Services'], ['sidewall', 'Tyre size'], ['coverage', 'Coverage'], ['reviews', 'Reviews'], ['contact', 'Call us'], ['callback', 'Callback']];
+  var N = SECTIONS.length, dlG = $('#dlG'), dlLinks = [], dnLab = $('#dnLab'), dnHub = $('#dnHub'), dnIdx = -1;
+  $('#dlP').setAttribute('d', ringC(100, 100, 74, 90));
+  SECTIONS.forEach(function (s, k) {
+    var a = -90 + k * 360 / N;
+    var g = svgEl('a', { href: '#' + s[0], class: 'dl', 'aria-label': 'Go to ' + s[1] }, dlG);
+    svgEl('path', { class: 'hit', d: arcC(100, 100, 79, a - 24, a + 24) }, g);
+    var t = svgEl('text', { 'text-anchor': 'middle' }, g);
+    var tp = svgEl('textPath', { href: '#dlP', startOffset: (frac(a, 90) * 100).toFixed(3) + '%' }, t); tp.textContent = s[1].toUpperCase();
+    g.addEventListener('click', function (e) { e.preventDefault(); jump(s[0]); });
+    dlLinks.push(g);
+  });
+  var dn = new Spring(function (x) { dlG.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 110, 0.72);
+  function jump(id) { var el = document.getElementById(id); scrollTo({ top: el.getBoundingClientRect().top + scrollY - (phone ? 56 : 0), behavior: RM ? 'auto' : 'smooth' }); }
+  function setDial(k) {
+    if (k === dnIdx) return; dnIdx = k;
+    dlLinks.forEach(function (b, j) { b.setAttribute('aria-current', String(j === k)); });
+    $$('.rm-i').forEach(function (b, j) { b.setAttribute('aria-current', String(j === k)); });
+    dnLab.textContent = SECTIONS[k][1]; dnHub.textContent = pad(k + 1);
+    dn.to(near(dn.x, -k * 360 / N));
+  }
+  // phone fan: section labels placed on a half-ellipse rising from the thumb-bar dial
+  var rmenu = $('#rmenu'), rmBtn = $('#rmBtn'), rmList = $('#rmList'), rmFan = $('#rmFan');
+  SECTIONS.forEach(function (s, k) {
+    var li = document.createElement('li');
+    li.innerHTML = '<a class="rm-i" href="#' + s[0] + '"><i>' + pad(k + 1) + '</i>' + s[1] + '</a>';
+    li.firstChild.addEventListener('click', function (e) { e.preventDefault(); closeMenu(); jump(s[0]); });
+    rmList.appendChild(li);
+  });
+  function layoutFan() {
+    // seven round keys on two concentric half-ellipses (4 outer, 3 inner) rising from the thumb-bar dial
+    var W = innerWidth, H = innerHeight, cx = W / 2, cy = H - 40, S = 68 + 8, rx = W / 2 - 34 - 8, rxi = rx * 0.62;
+    var OUT = [195, 245, 295, 345], IN = [225, 270, 315], best = null;
+    function place(ry, ryi) {
+      var pts = OUT.map(function (a) { a *= Math.PI / 180; return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]; })
+        .concat(IN.map(function (a) { a *= Math.PI / 180; return [cx + rxi * Math.cos(a), cy + ryi * Math.sin(a)]; }));
+      for (var i = 0; i < pts.length; i++) {
+        if (pts[i][1] > cy - 72 || pts[i][1] < 98) return null;
+        for (var j = i + 1; j < pts.length; j++) if (Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]) < S) return null;
+      }
+      return pts;
+    }
+    for (var ryi = 100; ryi < H && !best; ryi += 4) for (var ry = ryi + 40; ry < H; ry += 4) { var p = place(ry, ryi); if (p) { best = { pts: p, ry: ry }; break; } }
+    if (!best) { best = { pts: [], ry: H - 140 }; for (var k = 0; k < N; k++) best.pts.push([cx + (k % 2 ? 40 : -40), cy - 90 - k * 40]); }
+    $$('li', rmList).forEach(function (li, k) { li.style.transform = 'translate(' + best.pts[k][0].toFixed(1) + 'px,' + best.pts[k][1].toFixed(1) + 'px)'; });
+    rmFan.style.width = (2 * rx + 100) + 'px'; rmFan.style.height = (best.ry + 40 + 60) + 'px';
+  }
+  function openMenu() { rmenu.hidden = false; rmBtn.setAttribute('aria-expanded', 'true'); layoutFan(); var c = $('.rm-i[aria-current="true"]') || $('.rm-i'); c.focus(); }
+  function closeMenu() { if (rmenu.hidden) return; rmenu.hidden = true; rmBtn.setAttribute('aria-expanded', 'false'); }
+  rmBtn.addEventListener('click', function () { if (rmenu.hidden) openMenu(); else { closeMenu(); rmBtn.focus(); } });
+  rmenu.addEventListener('click', function (e) { if (!e.target.closest('.rm-i')) closeMenu(); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && !rmenu.hidden) { closeMenu(); rmBtn.focus(); } });
+
+  /* ---------- scroll: dial, services stage, tyre choreography ---------- */
+  var specEl = $('#sidewall');
+  function arcPx() { return parseFloat(getComputedStyle(specEl, '::before').height) || 0; }
+  var ticking = false;
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  function update() {
+    ticking = false;
+    var vh = innerHeight, k, best = 0;
+    for (k = 0; k < N; k++) if (document.getElementById(SECTIONS[k][0]).getBoundingClientRect().top <= vh * 0.45) best = k;
+    setDial(best);
+    if (phone) return;
+    var pr = svcPin.getBoundingClientRect(), span = svcPin.offsetHeight - vh;
+    setSvc(clamp(Math.floor((-pr.top / span) * 8), 0, 7));
+    if (!choreo) return;
+    var D = tyre.offsetWidth, g = ghost.getBoundingClientRect(), s = slotEl.getBoundingClientRect();
+    var d = s.width, tx = s.left, ty = s.top;
+    var y0 = scrollY, heroH = hero.offsetHeight;
+    var p1 = smooth(0, heroH * 0.62, y0), p2 = smooth(heroH * 0.62, heroH, y0);
+    var size1 = lerp(g.width, d, p1), x1 = g.left + (g.width - size1) / 2, top1 = g.top;
+    var size = lerp(size1, d, p2), x = lerp(x1, tx, p2), y = lerp(top1, ty, p2);
+    tyre.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + (size / D).toFixed(5) + ')';
+    tyre.style.visibility = (y + size < -20 || y > vh + 20) ? 'hidden' : '';
+    var hb = clamp(hero.getBoundingClientRect().bottom, 0, vh), sr = ringArea.getBoundingClientRect().right;
+    var sb = clamp(specEl.getBoundingClientRect().top - arcPx(), 0, vh);       // never over the next section either
+    layer.style.clipPath = 'polygon(0 0,100% 0,100% ' + hb + 'px,' + sr + 'px ' + hb + 'px,' + sr + 'px ' + sb + 'px,0 ' + sb + 'px)';
+    var m = p2 > 0.5 ? 'svc' : 'hero';
+    if (m !== mode) { mode = m; retarget(false); }
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', function () { placeChoices(); layoutDecoder(); if (!rmenu.hidden) layoutFan(); onScroll(); });
+  phoneMQ.addEventListener('change', setLayout);
+  reduceMQ.addEventListener('change', function () { RM = reduceMQ.matches; setLayout(); });
+
+  /* ---------- phone services rail + turning ring indicator ---------- */
+  var railEl = $('#rows'), railN = $('#railN'), miniSpin = $('#miniSpin'), mi = $('#miniIdx');
+  for (var j = 0; j < 8; j++) svgEl('rect', { x: 48, y: 8, width: 4, height: 14, fill: j ? 'rgba(255,255,255,.75)' : '#D81800', transform: 'rotate(' + j * 45 + ' 50 50)' }, mi);
+  var mini = new Spring(function (x) { miniSpin.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 120, 0.72), railIdx = 0;
+  railEl.addEventListener('scroll', function () {
+    if (!phone) return;
+    var w = rows[0].getBoundingClientRect().width + 12, i = clamp(Math.round(railEl.scrollLeft / w), 0, rows.length - 1);
+    if (i === railIdx) return; railIdx = i;
+    railN.textContent = pad(i + 1) + ' / 08';
+    mini.to(-i * 45);
+  }, { passive: true });
+
+  /* ---------- sidewall decoder: the marking set on an arc, round tap targets on a concentric arc ---------- */
+  var PARTS = [
+    ['01 · Width', '205 mm', 'How wide the tyre is from one sidewall to the other, in millimetres. 205 is one of the most common widths on family cars.'],
+    ['02 · Profile', '55%', 'The height of the sidewall as a percentage of the width. Here it is 55% of 205 mm, about 113 mm. A lower number means a lower, firmer sidewall.'],
+    ['03 · Rim', 'R16', 'R means radial construction, which almost every car tyre uses today. 16 is the diameter of the wheel it fits, in inches.'],
+    ['04 · Load index', '615 kg', 'Load index 91 means each tyre can carry up to 615 kg. Fit the load index your vehicle needs, or higher.'],
+    ['05 · Speed rating', '149 mph', 'V means the tyre is rated for speeds up to 149 mph (240 km/h). Fit at least the rating your vehicle needs.']
+  ];
+  var DEC = { cx: 600, cy: 1080, R: 900, start: 236 }, decSvg = $('#decSvg'), decText = $('#decText'), decBox = $('#decoder');
+  $('#decP').setAttribute('d', arcC(DEC.cx, DEC.cy, DEC.R, DEC.start, 360 - (DEC.start - 180)));
+  var GLY = [['205', 0], ['/', -1], ['55', 1], [' ', -2], ['R16', 2], [' ', -2], ['91', 3], ['V', 4]], ptEls = [];
+  GLY.forEach(function (gl) {
+    if (gl[1] === -2) { ptEls.push(null); return; }
+    var t = svgEl('text', { class: gl[1] < 0 ? 'sl' : 'pt' + (gl[1] === 0 ? ' on' : '') }, decText);
+    var tp = svgEl('textPath', { href: '#decP' }, t); tp.textContent = gl[0];
+    if (gl[1] >= 0) t.addEventListener('click', function () { explain(gl[1]); });
+    ptEls.push(t);
+  });
+  var parts = $$('.part'), exK = $('#exK'), exV = $('#exV'), exT = $('#exT'), exBox = $('#explain'), cur = 0;
+  function layoutDecoder() {
+    var arcLen = DEC.R * 2 * (270 - DEC.start) * Math.PI / 180, lens = [], total = 0, SP = 46;
+    ptEls.forEach(function (t) { var l = t ? t.getComputedTextLength() : SP; lens.push(l); total += l; });
+    var off = (arcLen - total) / 2, centres = [];
+    ptEls.forEach(function (t, i) { if (t) $('textPath', t).setAttribute('startOffset', off.toFixed(1)); if (GLY[i][1] >= 0) centres[GLY[i][1]] = off + lens[i] / 2; off += lens[i]; });
+    // round buttons on an inner concentric arc; spaced so they never overlap at any width
+    var sc = decBox.clientWidth / 1200, bw = parts[0].querySelector('.c').offsetWidth || 60, rIn = DEC.R - (phone ? 300 : 250);
+    var lw = Math.max.apply(null, parts.map(function (p) { return p.querySelector('.lbl').offsetWidth; })), stepPx = Math.max(bw, lw) + 12, avail = decBox.clientWidth - lw;
+    var zig = 4 * stepPx > avail;                       // narrow phones: alternate two radii so labels never collide
+    if (zig) stepPx = Math.max(bw + 8, avail / 4);
+    var minStep = stepPx / sc / rIn * 180 / Math.PI, angs = centres.map(function (c) { return DEC.start + c / DEC.R * 180 / Math.PI; });
+    for (var i = 1; i < 5; i++) if (angs[i] - angs[i - 1] < minStep) angs[i] = angs[i - 1] + minStep;
+    var shift = (angs[0] + angs[4]) / 2 - 270; angs = angs.map(function (a) { return a - shift; });
+    var ticks = $('#decTicks'); ticks.innerHTML = '';
+    $('#decQ').setAttribute('d', arcC(DEC.cx, DEC.cy, rIn + 70, angs[0] - 8, angs[4] + 8));
+    parts.forEach(function (p, i) {
+      var pt = Pc(DEC.cx, DEC.cy, rIn, angs[i]);
+      if (zig && i % 2) {                                 // drop below both neighbours, clear of their labels
+        var ph = p.offsetHeight, yn = Math.max(Pc(DEC.cx, DEC.cy, rIn, angs[i - 1])[1], Pc(DEC.cx, DEC.cy, rIn, angs[i + 1])[1]);
+        pt[1] = yn + (ph + 10) / sc;
+      }
+      p.style.left = (pt[0] * sc).toFixed(1) + 'px'; p.style.top = (pt[1] * sc).toFixed(1) + 'px';
+      var ta = DEC.start + centres[i] / DEC.R * 180 / Math.PI, a1 = Pc(DEC.cx, DEC.cy, DEC.R - 22, ta), a2 = Pc(DEC.cx, DEC.cy, rIn + 70, angs[i]);
+      svgEl('line', { x1: a1[0], y1: a1[1], x2: a2[0], y2: a2[1] }, ticks);
+    });
+    // the box grows to hold the lowest button and its label
+    var low = 0; parts.forEach(function (p) { low = Math.max(low, parseFloat(p.style.top) + p.offsetHeight / 2); });
+    var hpx = Math.max(560 * sc, low + 16); decBox.style.height = hpx.toFixed(0) + 'px'; decSvg.setAttribute('viewBox', '0 0 1200 ' + (hpx / sc).toFixed(0));
+  }
+  function explain(i) {
+    if (i === cur) return; cur = i;
+    parts.forEach(function (p) { p.setAttribute('aria-pressed', String(+p.getAttribute('data-p') === i)); });
+    ptEls.forEach(function (t, k) { if (t && GLY[k][1] >= 0) t.classList.toggle('on', GLY[k][1] === i); });
+    exK.textContent = PARTS[i][0]; exV.textContent = PARTS[i][1]; exT.textContent = PARTS[i][2];
+    if (!RM) { exBox.classList.remove('ex-swap'); void exBox.offsetWidth; exBox.classList.add('ex-swap'); }
+  }
+  var hoverable = matchMedia('(hover: hover)').matches;
+  parts.forEach(function (p) {
+    var i = +p.getAttribute('data-p');
+    p.addEventListener('click', function () { explain(i); });
+    p.addEventListener('focus', function () { explain(i); });
+    if (hoverable) p.addEventListener('mouseenter', function () { explain(i); });
+  });
+
+  /* ---------- coverage map towns ---------- */
+  var TOWNS = [['Deal', 998.6, 329.3, 'w'], ['Folkestone', 834.3, 489, 's'], ['Canterbury', 770.1, 264.1, 'e'], ['Whitstable', 732.4, 173, 's'], ['Herne Bay', 804.9, 159.1, 'e'], ['Margate', 987.7, 149.7, 'nw'], ['Ramsgate', 1008.8, 201.3, 'w'], ['Ashford', 625.8, 415.3, 'e'], ['Maidstone', 380.8, 273.4, 'e'], ['Medway', 380.8, 162.5, 's'], ['Dartford', 159.9, 76.5, 'e'], ['Sevenoaks', 193.1, 194.2, 'e'], ['Tunbridge Wells', 192.4, 431.7, 'e']];
+  var html = '';
+  TOWNS.forEach(function (t) {
+    var o = { e: [12, 7, 'start'], w: [-12, 7, 'end'], s: [0, 32, 'middle'], nw: [-12, -10, 'end'] }[t[3]];
+    html += '<circle cx="' + t[1] + '" cy="' + t[2] + '" r="5" fill="#fff" fill-opacity=".85"/><text class="lab" x="' + (t[1] + o[0]) + '" y="' + (t[2] + o[1]) + '" text-anchor="' + o[2] + '">' + t[0] + '</text>';
+  });
+  $('#towns').innerHTML = html + '<circle cx="936.2" cy="436.4" r="11" fill="#D81800"/><text class="dover" x="914" y="420" text-anchor="end">DOVER</text>';
+
+  /* ---------- reviews: names on a ring; the active one turns to 12 o'clock, its quote fills the centre ---------- */
+  var qs = $$('.q'), rvG = $('#rvG'), rvNames = [], rvIdx = 0, rail = $('#revRail');
+  $('#rvP').setAttribute('d', ring(430, 90));
+  qs.forEach(function (q, i) {
+    var a = -90 + i * 120, g = svgEl('a', { href: '#reviews', class: 'rv-name' + (i ? '' : ' on'), 'aria-label': 'Review by ' + $('b', q).textContent }, rvG);
+    var dp = P(470, a); svgEl('circle', { class: 'dot', cx: dp[0], cy: dp[1], r: 12 }, g);
+    var t = svgEl('text', { 'text-anchor': 'middle', dy: '10' }, g);
+    var tp = svgEl('textPath', { href: '#rvP', startOffset: (frac(a, 90) * 100).toFixed(3) + '%' }, t); tp.textContent = $('b', q).textContent.toUpperCase() + ' · GOOGLE';
+    g.addEventListener('click', function (e) { e.preventDefault(); showRev(i); });
+    rvNames.push(g);
+  });
+  var rvRot = new Spring(function (x) { rvG.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 90, 0.74);
+  function showRev(i) {
+    i = (i + qs.length) % qs.length; if (i === rvIdx) return; rvIdx = i;
+    qs.forEach(function (q, k) { q.classList.toggle('on', k === i); if (k === i && !RM) { q.classList.remove('is-in'); void q.offsetWidth; q.classList.add('is-in'); } });
+    rvNames.forEach(function (n, k) { n.classList.toggle('on', k === i); });
+    rvRot.to(near(rvRot.x, -i * 120));
+    $('#rvCount').textContent = pad(i + 1) + ' / 03';
+  }
+  $('#revPrev').addEventListener('click', function () { showRev(rvIdx - 1); });
+  $('#revNext').addEventListener('click', function () { showRev(rvIdx + 1); });
+  var dragX = null;
+  $('#rvWheel').addEventListener('pointerdown', function (e) { if (!phone) dragX = e.clientX; });
+  addEventListener('pointerup', function (e) { if (dragX === null) return; var dx = e.clientX - dragX; dragX = null; if (Math.abs(dx) > 40) showRev(rvIdx + (dx < 0 ? 1 : -1)); });
+  rail.addEventListener('keydown', function (e) { if (phone) return; if (e.key === 'ArrowRight') showRev(rvIdx + 1); if (e.key === 'ArrowLeft') showRev(rvIdx - 1); });
+  rail.addEventListener('scroll', function () {        // phones: swipe, with a circular progress ring
+    if (!phone) return;
+    var w = qs[0].getBoundingClientRect().width + 16, i = clamp(Math.round(rail.scrollLeft / w), 0, 2);
+    $('#rvArc').setAttribute('stroke-dashoffset', (113.1 * (1 - (i + 1) / 3)).toFixed(1));
+    $('#rvProgN').textContent = (i + 1) + ' / 3';
+  }, { passive: true });
+
+  /* ---------- reveals ---------- */
+  var dialSpin = $('#dialSpin'), cdial = new Spring(function (x) { dialSpin.style.transform = 'rotate(' + x.toFixed(2) + 'deg)'; }, 60, 0.7);
+  if (!RM) cdial.to(-50, true);
+  var thumb = $('#thumb');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        if (e.target.id === 'map') e.target.classList.add('in'); else cdial.to(0);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.35 });
+    io.observe($('#map')); io.observe($('.cdial'));
+    var heroGone = false, sendSeen = false;            // the thumb bar steps aside while the ticket's submit is on screen
+    function thumbState() { thumb.classList.toggle('show', heroGone && !sendSeen); if (!thumb.classList.contains('show')) closeMenu(); }
+    new IntersectionObserver(function (es) { var e = es[0]; heroGone = !e.isIntersecting && e.boundingClientRect.top < 0; thumbState(); }).observe($('#heroCta'));
+    new IntersectionObserver(function (es) { sendSeen = es[0].isIntersecting; thumbState(); }).observe($('.tk-send'));
+  } else { $('#map').classList.add('in'); cdial.to(0, true); thumb.classList.add('show'); }
+
+  /* ---------- callback ticket ---------- */
+  var form = $('#callback'), fName = $('#fName'), fPhone = $('#fPhone'), fWhere = $('#fWhere'), fSize = $('#fSize');
+  $('#useSize').addEventListener('click', function () {
+    fSize.value = '205/55 R16 91V';
+    $('#sizeNote').innerHTML = 'Added to field 05 of your callback ticket. <a href="#callback">Go to the ticket</a>';
+  });
+  function setErr(input, msg) {
+    var e = document.getElementById(input.getAttribute('aria-describedby'));
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    e.textContent = msg || ''; e.hidden = !msg;
+  }
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var name = fName.value.trim(), ph = fPhone.value.trim(), digits = ph.replace(/[^0-9]/g, ''), need = fNeed.value, bad = [];
+    setErr(fName, name ? '' : 'Please enter your name.'); if (!name) bad.push(fName);
+    var phMsg = !ph ? 'Please enter a phone number we can call.' : (digits.length < 10 || digits.length > 13) ? 'Please enter a full phone number, for example 07700 900123.' : '';
+    setErr(fPhone, phMsg); if (phMsg) bad.push(fPhone);
+    setErr(fNeed, need ? '' : 'Please choose what has happened.'); if (!need) bad.push(fNeed);
+    if (bad.length) { bad[0].focus(); return; }
+    var msg = 'Hi Road Max, please call me back.\nName: ' + name + '\nPhone: ' + ph + '\nNeed: ' + need;
+    if (fWhere.value.trim()) msg += '\nLocation: ' + fWhere.value.trim();
+    if (fSize.value.trim()) msg += '\nTyre size: ' + fSize.value.trim();
+    var url = 'https://wa.me/447842290576?text=' + encodeURIComponent(msg);
+    var flds = $$('.fld', form);
+    /* open WhatsApp synchronously inside the submit gesture (iOS Safari blocks opens from timers).
+       'noopener' as a feature makes window.open return null even on success, so the opener is cut by hand,
+       and a null return then really means blocked: fall back to navigating this tab. */
+    var win = window.open(url, '_blank');
+    if (win) { try { win.opener = null; } catch (x) {} } else { location.href = url; }
+    if (RM) { flds.forEach(function (f) { f.classList.add('lit'); }); return; }
+    flds.forEach(function (f, j) { setTimeout(function () { f.classList.add('lit'); }, j * 80); });
+    setTimeout(function () { flds.forEach(function (f) { f.classList.remove('lit'); }); }, 1000);
+  });
+
+  setLayout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { placeChoices(); layoutDecoder(); });
+})();
+</script>
+<script src="version-bar.js" defer></script>
+</body>
+</html>
